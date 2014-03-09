@@ -1,0 +1,140 @@
+/{userid}: 
+    description: reference a specific user in the Bandwidth Dashboard
+    
+    #  The resource tree that follows the root can be placed here.
+    # values in curly braces will appear as fillable parameters in the URL
+    # remember to fix these / delete these until the files are really there.
+    # /{example_ID}: #include example/example.raml
+    # /resourcename: #include resourcename/resourcename.raml
+
+    put:
+        
+        description:  |
+            This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the application of these capabilities.
+            Note that the resource that is being managed is a set of users, and that the payload reflects that.  POSTing to the users resource permits the creation of multiple user instances as part of a single action.
+            Please see the documentation on Users in the description of the Administrative API to the right.
+        body:
+            application/xml:
+                example: |
+                    <User>
+                        <Username>testcustomer</Username>
+                        <Password>newpassword</Password>
+                        <FirstName>Jane</FirstName>
+                        <LastName>Doe</LastName>
+                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                        <TelephoneNumber>9199999999</TelephoneNumber>
+                    </User>
+        responses:
+            200:
+                body: 
+                    application/xml:
+                        example: empty response
+    delete:
+        
+        description: Delete a User id
+        responses:
+            200:
+                body: 
+                    application/xml:
+                        example: empty response    
+    get:
+        
+        description: Retrieve theinformation (except the password) for a specific user id
+        queryParameters:
+            TN:
+                description: a TN - 10 Digits
+                type: string
+                example: 9199918388
+            PON:
+                description: Purchase Order Number - associated with the processing of the Port-in by third parties
+                type: string
+                example: bwc0000155348
+            CustomerOrderNumber:
+                description: An order-ID assigned by the customer for their own tracking purposes.  Filters for accounts that processed an order with the identified Customer order ID
+                example: ATT123456
+            Host:
+                description: An IP address associated with the account
+                example: 47.16.211.63
+            name:
+                description: The common name string representation of the account.  This parameter can be the first few characters of the account name.
+                type: string
+                example: Republic Wireless
+            other:
+                description: The common name string representation of the account.  This parameter can be the first few characters of the account name.
+                type: integer
+                maximum: 2000
+                minimum: 1
+                example: 1234
+                required: true
+                default: 300
+                repeat: true
+            OrderID:
+                description: An interal order ID that was used in conjunction with the account to process a transaction. This parameter can be the first few characters of the Order ID.
+                example: b1c0ffb4-76..
+        responses:
+            200:
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                            <UserResponse>
+                                <User>
+                                    <Username>testcustomer</Username>
+                                    <FirstName>Jane</FirstName>
+                                    <LastName>Doe</LastName>
+                                    <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                    <TelephoneNumber>9199999999</TelephoneNumber>
+                                    <Roles>
+                                        <Role>
+                                            <RoleName>ROLE_BDR</RoleName>
+                                            <Permissions>
+                                                <Permission>
+                                                    <PermissionName>VIEW</PermissionName>
+                                                </Permission>
+                                            </Permissions>
+                                        </Role>
+                                    </Roles>
+                                    <Accounts>
+                                        <Account>
+                                            <AccountId>12346095</AccountId>
+                                            <CompanyName>ABC Corp</CompanyName>
+                                        </Account>
+                                    </Accounts>
+                                </User>
+                            </UserResponse>
+    post:
+    
+        description: add a role or role permission to a specified user
+        body:
+            application/xml:
+                example: |
+                    <?xml version="1.0"?>
+                    <Roles>
+                        <Role>
+                            <RoleName>ROLE_API_SEARCH</RoleName>
+                            <Permissions>
+                                <Permission>
+                                    <PermissionName>VIEW</PermissionName>
+                                </Permission>
+                            </Permissions>
+                        </Role>
+                    </Roles>
+        responses:
+            201:
+                description: Created - the role was established for the specified user.
+                body: 
+                    application/xml:
+                        example: empty response
+            400:
+                description: | 
+                    Bad Request - if the role descriptions are incorrectly specified or conflict with existing roles then a 400 error will be returned with a descriptive payload.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                            <RolesResponse>
+                                <ResponseStatus>
+                                    <ErrorCode>12009</ErrorCode>
+                                    <Description>Permission 'UPDATE' is not allowed for role 'ROLE_API_SEARCH'</Description>
+                                </ResponseStatus>
+                            </RolesResponse>
