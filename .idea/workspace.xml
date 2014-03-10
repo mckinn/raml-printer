@@ -80,7 +80,7 @@
       <file leaf-file-name="RAMLMaker.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/RAMLMaker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="0" selection-start="97" selection-end="97" vertical-scroll-proportion="0.24285714" vertical-offset="0" max-vertical-offset="1700">
+            <state line="12" column="36" selection-start="279" selection-end="279" vertical-scroll-proportion="0.41632652" vertical-offset="0" max-vertical-offset="1700">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -435,7 +435,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="499" y="207" width="1171" height="1034" extended-state="0" />
+    <frame x="499" y="207" width="1171" height="1034" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -595,7 +595,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/RAMLMaker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="0" selection-start="97" selection-end="97" vertical-scroll-proportion="0.24285714" vertical-offset="0" max-vertical-offset="1700">
+        <state line="12" column="36" selection-start="279" selection-end="279" vertical-scroll-proportion="0.41632652" vertical-offset="0" max-vertical-offset="1700">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -4,7 +4,7 @@
     put:
         
         description:  |
-            This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the application of these capabilities.
+            This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the application of these capabilities. Hi.
             Note that the resource that is being managed is a set of users, and that the payload reflects that.  POSTing to the users resource permits the creation of multiple user instances as part of a single action.
             Please see the documentation on Users in the description of the Administrative API to the right.
         body:
