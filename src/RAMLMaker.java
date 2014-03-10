@@ -17,7 +17,7 @@ public class RAMLMaker {
         String token = "description:";
         Scanner example = null;
         try {
-            example = new Scanner(new File("super-simple RAML Example.raml"));
+            example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\src\\super-simple RAML Example.raml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -35,6 +35,7 @@ public class RAMLMaker {
         while (example.hasNextLine()) {
             if (token.equals("description:")) {
                 // create a RAMLDescription object and save it somewhere
+                theOne = new RAMLDescription();
                 token = example.next();
                 String description = "";
                 if (!token.equals("|")) {
