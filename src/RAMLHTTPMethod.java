@@ -19,5 +19,5 @@ public class RAMLHTTPMethod extends RAMLToken{
         return "RAML as HTML";
     }
 
-    void spewRAMLFile (){}
+    void spewRAMLFile (String toSave){}
 }

@@ -3,6 +3,9 @@
  */
 public class RAMLDescription extends RAMLToken {
 
+    public boolean pipedContent;
+    public String theRealDescription;
+
         RAMLDescription () {
         }
 
@@ -17,5 +20,5 @@ public class RAMLDescription extends RAMLToken {
             return "RAML Description as HTML";
         }
 
-        void spewRAMLFile (){}
+        void spewRAMLFile (String toSave){}
 }

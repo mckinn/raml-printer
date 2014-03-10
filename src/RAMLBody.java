@@ -2,7 +2,7 @@
  * Created by Dad on 3/9/14.
  */
 public class RAMLBody extends RAMLToken {
-
+// constructor for the object.
         RAMLBody () {
         }
 
@@ -18,6 +18,6 @@ public class RAMLBody extends RAMLToken {
             return "RAML as Body";
         }
 
-        void spewRAMLFile (){}
+        void spewRAMLFile (String toSave){}
 
 }
