@@ -1,18 +1,30 @@
+import java.util.Scanner;
+
 /**
  * Created by Dad on 3/9/14.
  */
 public class RAMLHTTPMethod extends RAMLToken{
 
-    RAMLHTTPMethod () {
+    RAMLToken [] subtendingThings;
+    String methodName;
+    int numberOfThings;
+    int maxNumberOfThings;
+
+    RAMLHTTPMethod (String typeOfMethod, int max) {
+        methodName = typeOfMethod;
+        maxNumberOfThings = max;
+        numberOfThings = 0;
+        subtendingThings = new RAMLToken[max];
 
     }
 
-    RAMLToken vaccuumRAMLFIle (){
+    void vaccuumRAMLFIle (Scanner example){
 
-        RAMLToken junk = new RAMLHTTPMethod();
-
-        return junk;
-
+        // while the number of spaces is current-number + 4
+        //     look for a description or a body
+        //     call the appropriate vaccuum for the type
+        //     place the resulting object in the array
+        //
     }
 
     String formatRAMLasHTML ( RAMLToken toFormat){
@@ -20,4 +32,6 @@ public class RAMLHTTPMethod extends RAMLToken{
     }
 
     void spewRAMLFile (String toSave){}
+
+    public  String stringMe(){ return " HTTP Method ";}
 }

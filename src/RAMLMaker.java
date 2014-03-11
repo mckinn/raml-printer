@@ -17,7 +17,7 @@ public class RAMLMaker {
         String token = "description:";
         Scanner example = null;
         try {
-            example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\src\\super-simple RAML Example.raml"));
+            example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -25,7 +25,7 @@ public class RAMLMaker {
 
 
 
-        RAMLDescription theOne = new RAMLDescription();
+        RAMLDescription theOne /* = new RAMLDescription() */;
         line = "";
         token = "";
         int arrayPosition = 0;
@@ -36,54 +36,29 @@ public class RAMLMaker {
             if (token.equals("description:")) {
                 // create a RAMLDescription object and save it somewhere
                 theOne = new RAMLDescription();
-                token = example.next();
-                String description = "";
-                if (!token.equals("|")) {
-                    line = example.nextLine();
-                    description += token + line;
-                    theOne.theRealDescription = description;
-                    theOne.pipedContent = true;
-                    token = example.next();
-                } else {
-                    line = example.nextLine();
-                    line = example.nextLine();
-                    int lineSpaces = lineSpaces(line, example);
-                    int baseLineSpaces = lineSpaces - 4;
-                    boolean quit = false;
-                        do {
-                            if (lineSpaces == 4+baseLineSpaces) {
-                                String lineSegment = line.substring(lineSpaces,line.length());
-                                description += lineSegment;
-                            }
-                            line = example.nextLine();
-                            lineSpaces = lineSpaces(line, example);
-                            if (lineSpaces <= baseLineSpaces) {
-                                quit = true;
-                            }
-                        } while (example.hasNextLine() && !quit);
-                    token = line.substring(lineSpaces,line.length());
-                    theOne.theRealDescription = description;
-                    theOne.pipedContent = false;
-                }
+                theOne.vaccuumRAMLFIle(example);
                 tokens[arrayPosition] = theOne;
-                descriptionArray[arrayPosition] = description;
+                arrayPosition ++;
+                token = example.next();
+                // descriptionArray[arrayPosition] = description;
             } else if ((token.equals("put:")) || (token.equals("get:")) || (token.equals("delete:")) || (token.equals("post:"))) {
                 // create a RAMLHTTPMethod object
-                arrayPosition ++;
+                // arrayPosition ++;
                 token = example.next();
             } else {
                 token = example.next();
             }
         }
-        for (int i=0; i<=arrayPosition; i++) {
+        for (int i=0; i<arrayPosition; i++) {
             System.out.println("Slot " + i + " is: " + tokens[i]);
         }
         System.out.println();
-        for (int i=0; i<=arrayPosition; i++) {
-            System.out.println("Description " + i + ": " + descriptionArray[i]);
+        for (int i=0; i<arrayPosition; i++) {
+            System.out.println("Description " + i + ": " + tokens[i].stringMe());
         }
     }
 
+    /*
     public static int lineSpaces(String line, Scanner example) {
         int i = 0;
         int spaces = 0;
@@ -93,4 +68,5 @@ public class RAMLMaker {
         }
         return spaces;
     }
+    */
 }

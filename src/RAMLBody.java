@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 /**
  * Created by Dad on 3/9/14.
  */
@@ -6,11 +8,10 @@ public class RAMLBody extends RAMLToken {
         RAMLBody () {
         }
 
-        RAMLToken vaccuumRAMLFIle (){
+        void vaccuumRAMLFIle (Scanner example){
 
             RAMLToken junk = new RAMLBody();
 
-            return junk;
 
         }
 
@@ -18,6 +19,8 @@ public class RAMLBody extends RAMLToken {
             return "RAML as Body";
         }
 
-        void spewRAMLFile (String toSave){}
+    void spewRAMLFile (String toSave){}
+
+    public  String stringMe(){ return " Body ";}
 
 }
