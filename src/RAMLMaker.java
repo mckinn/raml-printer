@@ -18,7 +18,8 @@ public class RAMLMaker {
         String token = "description:";
         Scanner example = null;
         try {
-            example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
+            //example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
+            example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -29,9 +30,10 @@ public class RAMLMaker {
             System.out.println(m);
         }
 
+        RAMLDescription RAMLD /* = new RAMLDescription() */;
+        RAMLBody RAMLB;
 
-
-        RAMLDescription theOne /* = new RAMLDescription() */;
+        // RAMLDescription theOne /* = new RAMLDescription() */;
         line = "";
         token = "";
         int arrayPosition = 0;
@@ -40,17 +42,23 @@ public class RAMLMaker {
         token = example.next();
         while (example.hasNextLine()) {
             successful = false;
-            theOne = null;
+            RAMLD = null;
             switch(markupType.stringToMarkuptype(token)){
                 case description:
                     // create a RAMLDescription object and save it somewhere
-                    theOne = new RAMLDescription();
-                    theOne.vaccuumRAMLFIle(example);
+                    RAMLD = new RAMLDescription();
+                    RAMLD.vaccuumRAMLFIle(example);
                     successful = true;
                     break;
                 case httpMethod:
                     break;
                 case body:
+                    System.out.println("body");
+                    RAMLB = new RAMLBody();
+                    RAMLB.vaccuumRAMLFIle(example);
+                    tokens[arrayPosition] = RAMLB;
+                    arrayPosition ++;
+                    token = example.next();
                     break;
                 case pathElement:
                     break;
@@ -90,7 +98,7 @@ public class RAMLMaker {
                     System.out.println("default string token = "+token);
             }
             if (successful) {
-                tokens[arrayPosition] = theOne;
+                tokens[arrayPosition] = RAMLD;
                 arrayPosition ++;
                 token = example.next();
             }
