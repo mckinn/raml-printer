@@ -5,7 +5,7 @@ import java.util.Scanner;
  */
 abstract class RAMLToken {
 
-    abstract void vaccuumRAMLFIle (Scanner example);
+    abstract String vaccuumRAMLFIle (Scanner example);
 
     abstract String formatRAMLasHTML ( RAMLToken toFormat);
 

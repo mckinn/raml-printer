@@ -9,7 +9,7 @@ public class RAMLBody extends RAMLToken {
         RAMLBody () {
         }
 
-        void vaccuumRAMLFIle (Scanner example){
+        String vaccuumRAMLFIle (Scanner example){
 
             // RAMLToken theOne;
             String token;
@@ -18,6 +18,7 @@ public class RAMLBody extends RAMLToken {
             // theOne = new RAMLDescription();
             token = example.next();
             String bodyFromFile = "";
+            line = example.nextLine();
             line = example.nextLine();
             int lineSpacesCount = lineSpaces(line, example);
             int baseLineSpaces = lineSpacesCount - 4;
@@ -37,6 +38,13 @@ public class RAMLBody extends RAMLToken {
                 } while (example.hasNextLine() && !quit);
             token = line.substring(lineSpacesCount,line.length());
             this.bodyContent = bodyLines;
+            int i = 0;
+            while (this.bodyContent[i] != null) {
+                System.out.println(this.bodyContent[i]);
+                i++;
+            }
+            String returnWord = "";
+            return returnWord;
         }
 
         String formatRAMLasHTML ( RAMLToken toFormat){

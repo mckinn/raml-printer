@@ -8,11 +8,12 @@ public class RAMLDescription extends RAMLToken {
 
     public boolean pipedContent;
     public String theRealDescription;
+    public String followingWord;
 
         RAMLDescription () {
         }
 
-        void vaccuumRAMLFIle (Scanner example){
+        String vaccuumRAMLFIle (Scanner example){
 
             // RAMLToken theOne;
             String token;
@@ -25,13 +26,16 @@ public class RAMLDescription extends RAMLToken {
                 descriptionFromFile += token + line;
                 this.theRealDescription = descriptionFromFile;
                 this.pipedContent = true;
-                token = example.next();
+                String returnWord = "";
+                return returnWord;
+                //token = example.next();
             } else {
                 line = example.nextLine();
                 line = example.nextLine();
                 int lineSpacesCount = lineSpaces(line, example);
                 int baseLineSpaces = lineSpacesCount - 4;
                 boolean quit = false;
+                String followingLine;
                 do {
                     if (lineSpacesCount == 4+baseLineSpaces) {
                         String lineSegment = line.substring(lineSpacesCount,line.length());
@@ -42,10 +46,17 @@ public class RAMLDescription extends RAMLToken {
                     if (lineSpacesCount <= baseLineSpaces) {
                         quit = true;
                     }
+                    followingLine = line;
                 } while (example.hasNextLine() && !quit);
-                token = line.substring(lineSpacesCount,line.length());
+                //token = line.substring(lineSpacesCount,line.length());
                 this.theRealDescription = descriptionFromFile;
                 this.pipedContent = false;
+                int endFirstWord = lineSpacesCount;
+                while ((endFirstWord < followingLine.length()) && (followingLine.charAt(endFirstWord) != ' ')) {
+                    endFirstWord++;
+                }
+                this.followingWord = followingLine.substring(lineSpacesCount,endFirstWord);
+                return followingWord;
             }
 
             // return junk;

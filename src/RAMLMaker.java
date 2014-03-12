@@ -30,6 +30,7 @@ public class RAMLMaker {
             System.out.println(m);
         }
 
+        RAMLToken ramlEntity;
         RAMLDescription RAMLD /* = new RAMLDescription() */;
         RAMLBody RAMLB;
 
@@ -39,26 +40,32 @@ public class RAMLMaker {
         int arrayPosition = 0;
         assert example != null;
         line = example.nextLine();
-        token = example.next();
+        //token = example.next();
+        String followingWord = "";
+        int followingWordCheck = 0;
         while (example.hasNextLine()) {
             successful = false;
-            RAMLD = null;
+            ramlEntity = null;
+            if (followingWord.equals("")) {
+                token = example.next();
+            } else {
+                token = followingWord;
+            }
             switch(markupType.stringToMarkuptype(token)){
                 case description:
                     // create a RAMLDescription object and save it somewhere
-                    RAMLD = new RAMLDescription();
-                    RAMLD.vaccuumRAMLFIle(example);
+                    System.out.println("description***");
+                    ramlEntity = new RAMLDescription();
+                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
                     successful = true;
                     break;
                 case httpMethod:
                     break;
                 case body:
-                    System.out.println("body");
-                    RAMLB = new RAMLBody();
-                    RAMLB.vaccuumRAMLFIle(example);
-                    tokens[arrayPosition] = RAMLB;
-                    arrayPosition ++;
-                    token = example.next();
+                    System.out.println("body***");
+                    ramlEntity = new RAMLBody();
+                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
+                    successful = true;
                     break;
                 case pathElement:
                     break;
@@ -98,10 +105,19 @@ public class RAMLMaker {
                     System.out.println("default string token = "+token);
             }
             if (successful) {
-                tokens[arrayPosition] = RAMLD;
+                tokens[arrayPosition] = ramlEntity;
                 arrayPosition ++;
-                token = example.next();
+                successful = false;
             }
+            if (followingWordCheck == 1) {
+                followingWord = "";
+                followingWordCheck = 0;
+            }
+            if (!followingWord.equals("")) {
+                followingWordCheck = 1;
+            }
+            //token = example.next();
+
             /* if (token.equals("description:")) {
                 // descriptionArray[arrayPosition] = description;
             } else if ((token.equals("put:")) || (token.equals("get:")) || (token.equals("delete:")) || (token.equals("post:"))) {
