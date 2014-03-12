@@ -14,6 +14,7 @@ public class RAMLMaker {
         //
         RAMLToken[] tokens = new RAMLToken[10];
         String[] descriptionArray = new String[10];
+        boolean successful;
         String token = "description:";
         Scanner example = null;
         try {
@@ -22,6 +23,11 @@ public class RAMLMaker {
             e.printStackTrace();
         }
         String line;
+
+        markupType theTypes [] = markupType.values();
+        for(markupType m : theTypes) {
+            System.out.println(m);
+        }
 
 
 
@@ -33,13 +39,62 @@ public class RAMLMaker {
         line = example.nextLine();
         token = example.next();
         while (example.hasNextLine()) {
-            if (token.equals("description:")) {
-                // create a RAMLDescription object and save it somewhere
-                theOne = new RAMLDescription();
-                theOne.vaccuumRAMLFIle(example);
+            successful = false;
+            theOne = null;
+            switch(markupType.stringToMarkuptype(token)){
+                case description:
+                    // create a RAMLDescription object and save it somewhere
+                    theOne = new RAMLDescription();
+                    theOne.vaccuumRAMLFIle(example);
+                    successful = true;
+                    break;
+                case httpMethod:
+                    break;
+                case body:
+                    break;
+                case pathElement:
+                    break;
+                case applicationXML:
+                    break;
+                case schema:
+                    break;
+                case example:
+                    break;
+                case responses:
+                    break;
+                case responsesvalues:
+                    break;
+                case queryParameters:
+                    break;
+                case queryParameterNames:
+                    break;
+                case qpType:
+                    break;
+                case qpMaximim:
+                    break;
+                case qpMinimum:
+                    break;
+                case qpRequired:
+                    break;
+                case qpRepeats:
+                    break;
+                case qpDefault:
+                    break;
+                case qpEnum:
+                    break;
+                case displayName:
+                    break;
+                case otcoThorpe:
+                    break;
+                default:
+                    System.out.println("default string token = "+token);
+            }
+            if (successful) {
                 tokens[arrayPosition] = theOne;
                 arrayPosition ++;
                 token = example.next();
+            }
+            /* if (token.equals("description:")) {
                 // descriptionArray[arrayPosition] = description;
             } else if ((token.equals("put:")) || (token.equals("get:")) || (token.equals("delete:")) || (token.equals("post:"))) {
                 // create a RAMLHTTPMethod object
@@ -47,7 +102,7 @@ public class RAMLMaker {
                 token = example.next();
             } else {
                 token = example.next();
-            }
+            } */
         }
         for (int i=0; i<arrayPosition; i++) {
             System.out.println("Slot " + i + " is: " + tokens[i]);
