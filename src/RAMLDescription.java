@@ -8,7 +8,6 @@ public class RAMLDescription extends RAMLToken {
 
     public boolean pipedContent;
     public String theRealDescription;
-    public String followingWord;
 
         RAMLDescription () {
         }
@@ -16,6 +15,7 @@ public class RAMLDescription extends RAMLToken {
         String vaccuumRAMLFIle (Scanner example){
 
             // RAMLToken theOne;
+            String followingWord;
             String token;
             String line;
             // theOne = new RAMLDescription();
@@ -26,23 +26,22 @@ public class RAMLDescription extends RAMLToken {
                 descriptionFromFile += token + line;
                 this.theRealDescription = descriptionFromFile;
                 this.pipedContent = true;
-                String returnWord = "";
-                return returnWord;
+                return example.nextLine();
                 //token = example.next();
             } else {
                 line = example.nextLine();
                 line = example.nextLine();
-                int lineSpacesCount = lineSpaces(line, example);
+                int lineSpacesCount = lineSpaces(line);
                 int baseLineSpaces = lineSpacesCount - 4;
                 boolean quit = false;
                 String followingLine;
                 do {
                     if (lineSpacesCount == 4+baseLineSpaces) {
                         String lineSegment = line.substring(lineSpacesCount,line.length());
-                        descriptionFromFile += lineSegment;
+                        descriptionFromFile += lineSegment + "\n";
                     }
                     line = example.nextLine();
-                    lineSpacesCount = lineSpaces(line, example);
+                    lineSpacesCount = lineSpaces(line);
                     if (lineSpacesCount <= baseLineSpaces) {
                         quit = true;
                     }
@@ -51,12 +50,12 @@ public class RAMLDescription extends RAMLToken {
                 //token = line.substring(lineSpacesCount,line.length());
                 this.theRealDescription = descriptionFromFile;
                 this.pipedContent = false;
-                int endFirstWord = lineSpacesCount;
+                /*int endFirstWord = lineSpacesCount;
                 while ((endFirstWord < followingLine.length()) && (followingLine.charAt(endFirstWord) != ' ')) {
                     endFirstWord++;
                 }
-                this.followingWord = followingLine.substring(lineSpacesCount,endFirstWord);
-                return followingWord;
+                followingWord = followingLine.substring(lineSpacesCount,endFirstWord);*/
+                return followingLine;
             }
 
             // return junk;
@@ -69,6 +68,6 @@ public class RAMLDescription extends RAMLToken {
     void spewRAMLFile (String toSave){}
 
     public  String stringMe(){
-        return "Piped Content: " + pipedContent + " \n " + theRealDescription;
+        return "Descriptoin: " + theRealDescription;
     }
 }

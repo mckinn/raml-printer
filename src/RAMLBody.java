@@ -5,7 +5,7 @@ import java.util.Scanner;
  */
 public class RAMLBody extends RAMLToken {
 // constructor for the object.
-    public String[] bodyContent;
+    public String bodyContent;
         RAMLBody () {
         }
 
@@ -14,37 +14,30 @@ public class RAMLBody extends RAMLToken {
             // RAMLToken theOne;
             String token;
             String line;
-            String[] bodyLines = new String[100];
+            String bodyLines = "";
             // theOne = new RAMLDescription();
             token = example.next();
             String bodyFromFile = "";
             line = example.nextLine();
             line = example.nextLine();
-            int lineSpacesCount = lineSpaces(line, example);
+            int lineSpacesCount = lineSpaces(line);
             int baseLineSpaces = lineSpacesCount - 4;
             boolean quit = false;
-            int arrayPosition = 0;
+            String followingLine;
                 do {
                     if (lineSpacesCount >= 4+baseLineSpaces) {
-                        String lineSegment = line.substring(lineSpacesCount,line.length());
-                        bodyLines[arrayPosition] = lineSegment;
-                        arrayPosition ++;
+                        String lineSegment = line.substring((baseLineSpaces+4),line.length());
+                        bodyLines += lineSegment + "\n";
                     }
                     line = example.nextLine();
-                    lineSpacesCount = lineSpaces(line, example);
+                    lineSpacesCount = lineSpaces(line);
                     if (lineSpacesCount <= baseLineSpaces) {
                         quit = true;
                     }
+                    followingLine = line;
                 } while (example.hasNextLine() && !quit);
-            token = line.substring(lineSpacesCount,line.length());
             this.bodyContent = bodyLines;
-            int i = 0;
-            while (this.bodyContent[i] != null) {
-                System.out.println(this.bodyContent[i]);
-                i++;
-            }
-            String returnWord = "";
-            return returnWord;
+            return followingLine;
         }
 
         String formatRAMLasHTML ( RAMLToken toFormat){
@@ -53,6 +46,7 @@ public class RAMLBody extends RAMLToken {
 
     void spewRAMLFile (String toSave){}
 
-    public  String stringMe(){ return " Body ";}
+    public  String stringMe(){ return "Body:\n" + this.bodyContent;}
+
 
 }

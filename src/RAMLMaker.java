@@ -60,6 +60,9 @@ public class RAMLMaker {
                     successful = true;
                     break;
                 case httpMethod:
+                    ramlEntity = new RAMLHTTPMethod(token, 10);
+                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
+                    successful = true;
                     break;
                 case body:
                     System.out.println("body***");
@@ -109,16 +112,16 @@ public class RAMLMaker {
                 arrayPosition ++;
                 successful = false;
             }
-            if (followingWordCheck == 1) {
+            /*if (followingWordCheck == 1) {
                 followingWord = "";
                 followingWordCheck = 0;
             }
             if (!followingWord.equals("")) {
                 followingWordCheck = 1;
-            }
+            }*/
             //token = example.next();
 
-            /* if (token.equals("description:")) {
+            /*if (token.equals("description:")) {
                 // descriptionArray[arrayPosition] = description;
             } else if ((token.equals("put:")) || (token.equals("get:")) || (token.equals("delete:")) || (token.equals("post:"))) {
                 // create a RAMLHTTPMethod object
@@ -133,7 +136,7 @@ public class RAMLMaker {
         }
         System.out.println();
         for (int i=0; i<arrayPosition; i++) {
-            System.out.println("Description " + i + ": " + tokens[i].stringMe());
+            System.out.println(tokens[i].stringMe());
         }
     }
 
