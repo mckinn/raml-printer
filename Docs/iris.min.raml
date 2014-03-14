@@ -1,0 +1,2658 @@
+#%RAML 0.8
+---
+title: IRIS REST API Documentation
+# Use null host here to trigger automatic replacement in javascript
+baseUri: http://null
+version: v1
+
+securedBy: [basic]
+
+securitySchemes:
+   - basic:
+        type: Basic Authentication
+
+/users: 
+    /{userid}: 
+        description: reference a specific user in the Bandwidth Dashboard
+        
+        put:
+            
+            description: Update a User id.  PUT can be used to update role or user data information associated with a user.
+            body:
+                application/xml:
+                    example: |
+                        <User>
+                            <Username>testcustomer</Username>
+                            <Password>newpassword</Password>
+                            <FirstName>Jane</FirstName>
+                            <LastName>Doe</LastName>
+                            <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                            <TelephoneNumber>9199999999</TelephoneNumber>
+                        </User>
+            responses:
+                200:
+                    body: 
+                        application/xml:
+                            example: empty response
+        delete:
+            
+            description: Delete a User id
+            responses:
+                200:
+                    body: 
+                        application/xml:
+                            example: empty response    
+        get:
+            
+            description: Retrieve theinformation (except the password) for a specific user id
+        
+            responses:
+                200:
+                    body: 
+                        application/xml:
+                            example: |
+                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                <UserResponse>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_BDR</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                        <Accounts>
+                                            <Account>
+                                                <AccountId>12346095</AccountId>
+                                                <CompanyName>ABC Corp</CompanyName>
+                                            </Account>
+                                        </Accounts>
+                                    </User>
+                                </UserResponse>
+        
+        /roles: 
+            description: reference the roles for a specific user in the system
+            
+            post:
+                
+                description: add a role or role permission to a specified user
+                body:
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <Roles>
+                                <Role>
+                                    <RoleName>ROLE_API_SEARCH</RoleName>
+                                    <Permissions>
+                                        <Permission>
+                                            <PermissionName>VIEW</PermissionName>
+                                        </Permission>
+                                    </Permissions>
+                                </Role>
+                            </Roles>
+                responses:
+                    201:
+                        description: Created - the role was established for the specified user.
+                        body: 
+                            application/xml:
+                                example: empty response
+                    400:
+                        description: | 
+                            Bad Request - if the role descriptions are incorrectly specified or conflict with existing roles then a 400 error will be returned with a descriptive payload.
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <RolesResponse>
+                                        <ResponseStatus>
+                                            <ErrorCode>12009</ErrorCode>
+                                            <Description>Permission 'UPDATE' is not allowed for role 'ROLE_API_SEARCH'</Description>
+                                        </ResponseStatus>
+                                    </RolesResponse>
+                
+            get:
+                
+                description: Retrieve the roles and permissions that are associated with a named user-id
+            
+                responses:
+                    200:
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <RolesResponse>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_API_ORDERING</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>IMPORT_TO_AVAILABLE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_PROFILE</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_DLDA</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_BDR</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_SEARCH</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                    </RolesResponse>
+
+
+    
+    description: |
+        This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the applicatoin of these capabilities.
+    
+        Note that the resource that is being managed is a set of users, and that the payload reflects that.  POSTing to the users resource permits the creation of multiple user instances as part of a single action.
+    
+        Please see the documentation on Users in the description of the Administrative API to the right.
+    post:
+        description: Create a user.  All fields in the payload are required
+        body:
+            application/xml:
+                example: |
+                    <Users>
+                        <User>
+                            <Username>testcustomer</Username>
+                            <Password>test123</Password>
+                            <FirstName>Jane</FirstName>
+                            <LastName>Doe</LastName>
+                            <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                            <TelephoneNumber>9199999999</TelephoneNumber>
+                        </User>
+                    </Users>
+        responses:
+            201:
+                description: |
+                    Created.
+    
+                    No Body or location header is returned with this API call.  Details on the created user can be retieved with a get on the user-id
+    
+    get: 
+        description: 
+            Get a list of all users in the system
+    
+            The Payload includes a description of each user, including the user permissions.  User details and a list of customers that the user has access to is only contained in the payload response to a call on a specific user resource
+        responses:
+            200:
+                description: The request is valid and a list of users can be returned.
+                body:
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <UsersResponse>
+                                <Users>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_ADMIN</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                    </User>
+                                    <User>
+                                        <Username>johndoe</Username>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_AGENT</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                    </User>
+                                </Users>
+                            </UsersResponse>         
+
+/accounts: 
+    description: |
+      The API account is the root resource for many of the operations in the Bandwidth Dashboard API.  The account is represented by an account id, and is the resource that represents a Bandwidth customer, providing a root resource for all of the customer's attributes and services 
+    
+    post:
+      description: Create an Account
+      body:
+          application/xml:
+              example: 
+                  <?xml version="1.0"?>
+                  <Account>
+                    <CompanyName>ABC Corp</CompanyName>
+                    <AccountType>Business</AccountType>
+                    <Tiers>
+                      <Tier>0</Tier>
+                    </Tiers>
+                    <ExternalId>123</ExternalId>
+                    <BillingCycle>1</BillingCycle>
+                    <Pricing>1</Pricing>
+                    <NenaId>A123</NenaId>
+                    <PenaltyType/>
+                    <Contact>
+                      <FirstName>John</FirstName>
+                      <LastName>Doe</LastName>
+                      <Suffix>Jr</Suffix>
+                      <Title/>
+                      <Phone>9199919999</Phone>
+                      <Fax/>
+                      <Mobile/>
+                      <OtherPhone/>
+                      <Email>johndoe@abc.com</Email>
+                      <WebsiteAddress/>
+                    </Contact>
+                    <Address>
+                      <HouseNumber>123</HouseNumber>
+                      <HouseSuffix/>
+                      <PreDirectional/>
+                      <StreetName>Main Street</StreetName>
+                      <StreetSuffix/>
+                      <PostDirectional/>
+                      <AddressLine2/>
+                      <City>RALEIGH</City>
+                      <StateCode>NC</StateCode>
+                      <Zip>27606</Zip>
+                      <PlusFour/>
+                      <County>WAKE</County>
+                      <Country>United States</Country>
+                      <AddressType>Billing</AddressType>
+                    </Address>
+                  </Account>
+
+      responses:
+          200:
+              body:
+                  application/xml:
+                      example: None
+    
+    get:
+      description: Retrieve information about the an account or set of accounts, as guided by optional search parameters.
+      queryParameters:
+        TN:
+            description: a TN - 10 Digits
+            type: string
+            example: 9199918388
+        PON:
+            description: Purchase Order Number - associated with the processing of the Port-in by third parties
+            type: string
+            example: bwc0000155348
+        CustomerOrderNumber:
+            description: An order-ID assigned by the customer for their own tracking purposes.  Filters for accounts that processed an order with the identified Customer order ID
+            example: ATT123456
+        Host:
+            description: An IP address associated with the account
+            example: 47.16.211.63
+        name:
+            description: The common name string representation of the account.  This parameter can be the first few characters of the account name.
+            type: string
+            example: Republic Wireless
+        OrderID:
+            description: An interal order ID that was used in conjunction with the account to process a transaction. This parameter can be the first few characters of the Order ID.
+            example: b1c0ffb4-76..
+      responses:
+        200:
+            body:
+                application/xml:
+                    example: |
+                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                        <AccountsResponse>
+                          <Accounts>
+                            <Account>
+                              <AccountId>138</AccountId>
+                              <CompanyName>1 Plug Corporation</CompanyName>
+                            </Account>
+                            <Account>
+                              <AccountId>309</AccountId>
+                              <CompanyName>1A Auto Inc</CompanyName>
+                            </Account>
+                          </Accounts>
+                        </AccountsResponse>
+    
+    /{accountid}: 
+        
+        description: Account ID Desc
+        
+        put:
+            
+            description: Update Account
+            body:
+                application/xml:
+                    example: 
+                        <?xml version="1.0"?>
+                        <Account>
+                          <CompanyName>ABC Corp</CompanyName>
+                          <AccountType>Business</AccountType>
+                          <Tiers>
+                            <Tier>0</Tier>
+                          </Tiers>
+                          <ExternalId>123</ExternalId>
+                          <BillingCycle>1</BillingCycle>
+                          <Pricing>1</Pricing>
+                          <NenaId>A123</NenaId>
+                          <PenaltyType/>
+                          <Contact>
+                            <FirstName>John</FirstName>
+                            <LastName>Doe</LastName>
+                            <Suffix>Jr</Suffix>
+                            <Title/>
+                            <Phone>9199919999</Phone>
+                            <Fax/>
+                            <Mobile/>
+                            <OtherPhone/>
+                            <Email>johndoe@abc.com</Email>
+                            <WebsiteAddress/>
+                          </Contact>
+                          <Address>
+                            <HouseNumber>123</HouseNumber>
+                            <HouseSuffix/>
+                            <PreDirectional/>
+                            <StreetName>Main Street</StreetName>
+                            <StreetSuffix/>
+                            <PostDirectional/>
+                            <AddressLine2/>
+                            <City>RALEIGH</City>
+                            <StateCode>NC</StateCode>
+                            <Zip>27606</Zip>
+                            <PlusFour/>
+                            <County>WAKE</County>
+                            <Country>United States</Country>
+                            <AddressType>Billing</AddressType>
+                          </Address>
+                        </Account>
+
+            responses:
+                200:
+                    body:
+                        application/xml:
+                            example: None
+        
+        delete:
+            
+            description: Delete Account [Currently Unsupported]
+            body:
+            responses:
+                405:
+        
+        get:
+            description: Retrieve information about the account indicated by the Account ID Resource ID
+            responses:
+                200:
+                    body:
+                        application/xml:
+                            example: |
+                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                <AccountResponse>
+                                  <Account>
+                                    <AccountId>14</AccountId>
+                                    <CompanyName>CWI Hosting</CompanyName>
+                                    <AccountType>Business</AccountType>
+                                    <NenaId>
+                                </NenaId>
+                                    <Tiers>
+                                      <Tier>0</Tier>
+                                    </Tiers>
+                                    <Address>
+                                      <HouseNumber>60</HouseNumber>
+                                      <HouseSuffix>
+                                </HouseSuffix>
+                                      <PreDirectional>
+                                </PreDirectional>
+                                      <StreetName>Pine</StreetName>
+                                      <StreetSuffix>St</StreetSuffix>
+                                      <PostDirectional>
+                                </PostDirectional>
+                                      <AddressLine2>
+                                </AddressLine2>
+                                      <City>Denver</City>
+                                      <StateCode>CO</StateCode>
+                                      <Zip>80016</Zip>
+                                      <PlusFour>
+                                </PlusFour>
+                                      <County>
+                                </County>
+                                      <Country>United States</Country>
+                                      <AddressType>Service</AddressType>
+                                    </Address>
+                                    <Contact>
+                                      <FirstName>Sanjay</FirstName>
+                                      <LastName>Rao</LastName>
+                                      <Phone>9195441234</Phone>
+                                      <Email>srao@bandwidth.com</Email>
+                                    </Contact>
+                                    <ReservationAllowed>true</ReservationAllowed>
+                                  </Account>
+                                </AccountResponse>
+        
+        /users: 
+            /{userid}: 
+                put:
+                    
+                    description: Add a role to a userid. If a request does not contain a role the userid previously had, it will be removed.
+                    body:
+                        application/xml:
+                            schema: |
+                                <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                                <xs:element name="User">
+                                    <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="Username"/>
+                                        <xs:element type="xs:string" name="Password"/>
+                                        <xs:element type="xs:string" name="FirstName"/>
+                                        <xs:element type="xs:string" name="LastName"/>
+                                        <xs:element type="xs:string" name="EmailAddress"/>
+                                        <xs:element type="xs:long" name="TelephoneNumber"/>
+                                        <xs:element name="Roles">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                            <xs:element name="Role">
+                                                <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element type="xs:string" name="RoleName"/>
+                                                    <xs:element name="Permissions">
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                        <xs:element name="Permission" maxOccurs="unbounded" minOccurs="0">
+                                                            <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element type="xs:string" name="PermissionName"/>
+                                                            </xs:sequence>
+                                                            </xs:complexType>
+                                                        </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                </xs:schema>
+                            example: |
+                                <User>
+                                    <Username>testcustomer</Username>
+                                    <Password>newpassword</Password>
+                                    <FirstName>Jane</FirstName>
+                                    <LastName>Doe</LastName>
+                                    <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                    <TelephoneNumber>9199999999</TelephoneNumber>
+                                    <Roles>
+                                        <Role>
+                                            <RoleName>role_admin</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                            <PermissionName>view</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                            <PermissionName>update</PermissionName>
+                                                        </Permission>
+                                                </Permissions>
+                                            </Role>
+                                    </Roles>
+                                </User>
+                    responses:
+
+            post:
+                
+                description: Adds a user to an existing account
+                body:
+                    application/xml:
+                        schema: |
+                            <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xs:element name="Users">
+                                <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="User">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                        <xs:element type="xs:string" name="Username"/>
+                                        <xs:element type="xs:string" name="Password"/>
+                                        <xs:element type="xs:string" name="FirstName"/>
+                                        <xs:element type="xs:string" name="LastName"/>
+                                        <xs:element type="xs:string" name="EmailAddress"/>
+                                        <xs:element type="xs:long" name="TelephoneNumber"/>
+                                        <xs:element name="Roles">
+                                            <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="Role" maxOccurs="unbounded" minOccurs="0">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                    <xs:element type="xs:string" name="RoleName"/>
+                                                    <xs:element name="Permissions">
+                                                        <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="Permission" maxOccurs="unbounded" minOccurs="0">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                <xs:element type="xs:string" name="PermissionName"/>
+                                                                </xs:sequence>
+                                                            </xs:complexType>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            </xs:schema>
+                        example: |
+                            <Users>
+                                <User>
+                                    <Username>testcustomer</Username>
+                                    <Password>newpassword</Password>
+                                    <FirstName>Jane</FirstName>
+                                    <LastName>Doe</LastName>
+                                    <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                    <TelephoneNumber>9199999999</TelephoneNumber>
+                                    <Roles>
+                                    <Role>
+                                        <RoleName>role_api_search</RoleName>
+                                        <Permissions>
+                                        <Permission>
+                                            <PermissionName>view</PermissionName>
+                                        </Permission>
+                                        </Permissions>
+                                    </Role>
+                                        <Role>
+                                        <RoleName>role_api_ordering</RoleName>
+                                        <Permissions>
+                                        <Permission>
+                                            <PermissionName>view</PermissionName>
+                                        </Permission>
+                                        <Permission>
+                                            <PermissionName>update</PermissionName>
+                                        </Permission>
+                                        </Permissions>
+                                    </Role>    
+                                    </Roles>
+                                </User>
+                            </Users>
+                responses:
+            get:
+                
+                description: Adds a user to an existing account
+                body:
+                    application/xml:
+                        schema: |
+                            <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xs:element name="UsersResponse">
+                                <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="Users">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                        <xs:element name="User" maxOccurs="unbounded" minOccurs="0">
+                                            <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element type="xs:string" name="Username"/>
+                                                <xs:element type="xs:string" name="FirstName"/>
+                                                <xs:element type="xs:string" name="LastName"/>
+                                                <xs:element type="xs:string" name="EmailAddress"/>
+                                                <xs:element type="xs:long" name="TelephoneNumber"/>
+                                                <xs:element name="Roles">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                    <xs:element name="Role" maxOccurs="unbounded" minOccurs="0">
+                                                        <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element type="xs:string" name="RoleName"/>
+                                                            <xs:element name="Permissions">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                <xs:element name="Permission" maxOccurs="unbounded" minOccurs="0">
+                                                                    <xs:complexType>
+                                                                    <xs:sequence>
+                                                                        <xs:element type="xs:string" name="PermissionName"/>
+                                                                    </xs:sequence>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                </xs:sequence>
+                                                            </xs:complexType>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            </xs:schema>
+                        example: |
+                            <?xml version="1.0"?>
+                            <UsersResponse>
+                                <Users>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_API_ORDERING</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_HISTORY</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_ADMIN</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_SITE</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_SEARCH</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                    </User>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
+                                        <Roles>
+                                            <Role>
+                                                <RoleName>ROLE_API_ORDERING</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_SITE</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                    <Permission>
+                                                        <PermissionName>UPDATE</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                            <Role>
+                                                <RoleName>ROLE_API_SEARCH</RoleName>
+                                                <Permissions>
+                                                    <Permission>
+                                                        <PermissionName>VIEW</PermissionName>
+                                                    </Permission>
+                                                </Permissions>
+                                            </Role>
+                                        </Roles>
+                                    </User>
+                                </Users>
+                            </UsersResponse>
+                        
+                        
+                        
+                        
+                        
+                        
+
+        /products: 
+            description: |
+               this is a piped description
+               and this is the second line of a piped description
+            
+            post:
+                description:  Add a new product to the account
+                body:
+                    application/xml:
+                        example:
+                            <Product>
+                            <Name>TollFree</Name>
+                            </Product>
+                responses:
+                    200:
+                        body:
+                            application/xml:
+                                example: None
+            
+            get:
+                description: discover what is currently enabled on the account
+                responses:
+                    200:
+                        body:
+                            application/xml:
+                                example: |
+                                  <?xml version="1.0"?>
+                                  <AccountProductsResponse>
+                                      <Products>
+                                          <Product>
+                                              <Name>Termination</Name>
+                                          </Product>
+                                          <Product>
+                                              <Name>VirtualInventory</Name>
+                                          </Product>
+                                          <Product>
+                                              <Name>TollFree</Name>
+                                          </Product>
+                                          <Product>
+                                              <Name>Origination</Name>
+                                              <Features>
+                                                  <Feature>CallForwarding</Feature>
+                                                  <Feature>DlDa</Feature>
+                                                  <Feature>CNAM</Feature>
+                                              </Features>
+                                          </Product>
+                                          <Product>
+                                              <Name>SMS</Name>
+                                          </Product>
+                                      </Products>
+                                  </AccountProductsResponse>
+            
+            /origination: 
+                displayName: george
+                description: The george origination resource controls the Origination features and settings that can be added to an account.
+                
+                post:
+                    description: |
+                      Add Origination to the account.    
+                      The payload contains (optional) features that can be 
+                      offered to the subscribers of the account  These features  are enabled for DIDs in 
+                      the account, but must still be provisioned on a DID-by-DID basis.
+                    body:
+                        application/xml:
+                            example: |
+                              <?xml version="1.0"?>
+                              <Product>
+                                  <Name>Origination</Name>
+                                  <Features>
+                                      <Feature>CallForwarding</Feature>
+                                      <Feature>DLDA</Feature>
+                                      <Feature>CNAM</Feature>
+                                  </Features>
+                              </Product>
+                
+                    responses:
+                        200:
+                          description: The Origination feature was added to the account
+                        400:
+                          description: Some field error prevented the addition of the feature to the account.
+                
+                get:
+                    description: |
+                      Examine the Origination capabilities of the account.  The response also contains information that 
+                      describes the Origination features that are enabled for the account.  All of these features still 
+                      need to be provisioned for any DIDs that will be enabled to use the Feature
+                    responses:
+                        200:
+                            body:
+                                application/xml:
+                                    example: |
+                                      <AccountProductResponse>
+                                        <Product>
+                                          <Name>Origination</Name>
+                                          <Features>
+                                            <Feature>CallForwarding</Feature>
+                                            <Feature>DlDa</Feature>
+                                            <Feature>CNAM</Feature>
+                                           </Features>
+                                         </Product>
+                                      </AccountProductResponse>
+                
+                /tntotals: 
+                    
+                    description: Retrieves the TN Counts for all TNs, sorted by NPANXX - primarily for billing and taxation purposes
+                    
+                    get:
+                        description: |
+                            Retrieve the TN Counts by NPANXX 
+                        responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                            200:
+                                description: Success - there are Orig TNs on this account.  If there are not TNs the
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <ProductTNDetailsResponse>
+                                                <ProductTNDetails>
+                                                    <Origination>
+                                                        <NPANXXDetailList>
+                                                            <NPANXXDetail>
+                                                                <NPANXX>724519</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>1</Count>
+                                                            </NPANXXDetail>
+                                                            <NPANXXDetail>
+                                                                <NPANXX>406647</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>2</Count>
+                                                            </NPANXXDetail>
+                                                            <NPANXXDetail>
+                                                                <NPANXX>657666</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>1</Count>
+                                                            </NPANXXDetail>
+                                                            <!-- SNIP -->
+                                                            <NPANXXDetail>
+                                                                <NPANXX>502694</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>2</Count>
+                                                            </NPANXXDetail>
+                                                            <NPANXXDetail>
+                                                                <NPANXX>202684</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>3</Count>
+                                                            </NPANXXDetail>
+                                                            <NPANXXDetail>
+                                                                <NPANXX>615219</NPANXX>
+                                                                <Tier>0</Tier>
+                                                                <Count>3</Count>
+                                                            </NPANXXDetail>
+                                                        </NPANXXDetailList>
+                                                    </Origination>
+                                                </ProductTNDetails>
+                                            </ProductTNDetailsResponse> 
+                            400:
+                                description: |
+                                    Failure to parse the request, or inconsistent provisioned data, such as no related product associated with the account.
+                    
+                    #  The resource tree that follows the root can be placed here.
+                    # values in curly braces will appear as fillable parameters in the URL
+                    # remember to fix these / delete these until the files are really there.
+                    # /{example_ID}: #include example/example.raml
+                    # /resourcename: #include resourcename/resourcename.raml
+
+
+            /termination: 
+                displayName: tester ID   # displayName is not yet supported
+                description: tester ID
+                
+                get:
+                    description: |
+                        A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword 
+                    queryParameters:
+                        account:
+                            type: string
+                            required: true
+                            description: the account that the user is valid for
+                            default: 20
+                        direction:
+                            description: hardy har har
+                            type: string
+                            example: a_string
+                        inclination:
+                            description: another fing description
+                            type: integer
+                            example: 98764
+                            maximum: 99999
+                    responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                        200:
+                            description: An optional description of the response.
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <example>
+                                            example content is piped content that will be provided as an example
+                                            in this case of the Response
+                                        </example> 
+                        400:
+                            description: |
+                                The description can be used for discussing generic responses.
+                                Note that descriptions anywhere can be piped content. Lines will be concatenated together.
+                                *_Markup is allowed_*
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <example>
+                                            example content is piped content that will be provided as an example
+                                            in this case of the Response
+                                        </example> 
+                
+                post:
+                    description: Create a user
+                    body:
+                        application/xml:
+                            example: |
+                                <Users>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <Password>test123</Password>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
+                                    </User>
+                                </Users>
+                    responses:
+                        200:
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <UsersResponse>
+                                            <Users>
+                                                <User>
+                                                    <Username>admin</Username>
+                                                    <Roles>
+                                                        <Role>
+                                                            <RoleName>ROLE_ADMIN</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                                <Permission>
+                                                                    <PermissionName>UPDATE</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                        <Role>
+                                                            <RoleName>ROLE_BDR</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                    </Roles>
+                                                </User>
+                                            </Users>
+                                        </UsersResponse>
+                 
+                put:
+                    description: |
+                        A piped description that has 
+                        more than one line and some 
+                        * markup 
+                    responses:
+                        200:
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <UsersResponse>
+                                            <Users>
+                                                <User>
+                                                    <Username>admin</Username>
+                                                    <Roles>
+                                                        <Role>
+                                                            <RoleName>ROLE_ADMIN</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                                <Permission>
+                                                                    <PermissionName>UPDATE</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                        <Role>
+                                                            <RoleName>ROLE_BDR</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                    </Roles>
+                                                </User>
+                                            </Users>
+                                        </UsersResponse>               
+                
+                # The resource tree that follows the root can be placed here.
+                # values in curly braces will appear as fillable parameters in the URL
+                # remember to fix these / delete these until the files are really there.
+
+            /tollfree: 
+                description: |
+                   this is a two line description with a newline
+                   inserted into it that describes the overly complicated tollfree
+                   product
+                
+                post:
+                    description:  Add a new product to the account
+                    body:
+                        application/xml:
+                            example:
+                                <Product>
+                                <Name>TollFree</Name>
+                                </Product>
+                    responses:
+                        200:
+                            body:
+                                application/xml:
+                                    example: None
+                
+                get:
+                    description: discover what is currently enabled on the account
+                    responses:
+                        200:
+                            body:
+                                application/xml:
+                                    example: |
+                                      <?xml version="1.0"?>
+                                      <AccountProductsResponse>
+                                          <Products>
+                                              <Product>
+                                                  <Name>Termination</Name>
+                                              </Product>
+                                              <Product>
+                                                  <Name>VirtualInventory</Name>
+                                              </Product>
+                                              <Product>
+                                                  <Name>TollFree</Name>
+                                              </Product>
+                                              <Product>
+                                                  <Name>Origination</Name>
+                                                  <Features>
+                                                      <Feature>CallForwarding</Feature>
+                                                      <Feature>DlDa</Feature>
+                                                      <Feature>CNAM</Feature>
+                                                  </Features>
+                                              </Product>
+                                              <Product>
+                                                  <Name>SMS</Name>
+                                              </Product>
+                                          </Products>
+                                      </AccountProductsResponse>
+                
+                /tntotals: 
+                    
+                    description: Retrieves the Toll Free TN Counts for the account - primarily for billing and taxation purposes
+                    
+                    get:
+                        description: |
+                            Retrieve the number of Toll Free TNs on this account 
+                        responses:    
+                            200:
+                                description: Success - there are Toll Free TNs on this account.  Only the raw count is important.
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <ProductTNDetailsResponse>
+                                                <ProductTNDetails>
+                                                    <Tollfree>
+                                                        <Count>17</Count>
+                                                    </Tollfree>
+                                                </ProductTNDetails>
+                                            </ProductTNDetailsResponse> 
+                            400:
+                                description: |
+                                    Failure to parse the request, or inconsistent provisioned data, such as no related product associated with the account.
+                    
+                    #  The resource tree that follows the root can be placed here.
+                    # values in curly braces will appear as fillable parameters in the URL
+                    # remember to fix these / delete these until the files are really there.
+                    # /{example_ID}: #include example/example.raml
+                    # /resourcename: #include resourcename/resourcename.raml
+
+
+
+        /sites: 
+            get:
+                
+                responses:
+                    200:
+                        body:
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0"?>
+                                    <SitesResponse>
+                                        <Sites>
+                                        <Site>
+                                            <Id>399</Id>
+                                            <Name>Testsite</Name>
+                                            <Description>NewSite</Description>
+                                        </Site>
+                                        <Site>
+                                            <Id>403</Id>
+                                            <Name>GABESITEa</Name>
+                                            <Description>Awesomeness</Description>
+                                        </Site>
+                                        </Sites>
+                                    </SitesResponse>
+
+        /inserviceNumbers: 
+            description: |
+                Find the In Service numbers on the account
+            
+                The inservicenumbers query will return all of the inservice numbers on the account, filtered with a wide range of 
+                search query parameters.  Note that many search combinations will not return a meaningful result because the search 
+                parameters are mutually exclusive.  Since mutually exclusive search criteria result from data that can't  satisfy all of
+                the criteria, these are not flagged as errors, and instead simply return an empty result.
+            
+            get:
+                description: |
+                    A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword 
+                queryParameters:
+                    page:
+                        description: the page to fetch in a paginated collection
+                        type: integer
+                        required: true
+                        default: 1
+                    size:
+                        description: the number of TNs to retrieve
+                        type: integer
+                        required: true
+                        default: 300
+                    areacode:
+                        description: An Area Code search filter - all returned TNs will be in the entered Area Code
+                        type: integer
+                        example: 919
+                        minimum: 200
+                        maximum: 999
+                    npanxx:
+                        description: An NPA NXX search filter - all returned TNs will be in the entered NPA NXX dial plan
+                        type: integer
+                        example: 919859
+                        minimum: 200000
+                        maximum: 999999
+                    lata:
+                        description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  Typically this is a 3 or 5 digit value
+                        type: integer
+                        example: 435
+                        minimum: 001
+                        maximum: 99999
+                    state:
+                        description: A State search filter - all returned TNs will be in the entered State.  This is a 2-character State or Province abbreviation
+                        type: string
+                        example: TX
+                    ratecenter:
+                        description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  This Rate Center must be combined with a State in the query.  If State is not included in the query then the queryu will fail.
+                        type: string
+                        example: PLANO
+            
+                responses: 
+                    200:
+                        description: A successful result that contains the response data
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0"?>
+                                    <TNs>
+                                        <TotalCount>59</TotalCount>
+                                        <Links>
+                                            <first> ( a link goes here ) </first>
+                                        </Links>
+                                        <TelephoneNumbers>
+                                            <Count>59</Count>
+                                            <TelephoneNumber>8043024183</TelephoneNumber>
+                                            <TelephoneNumber>8042121778</TelephoneNumber>
+                                            <TelephoneNumber>8042146066</TelephoneNumber>
+                                            <TelephoneNumber>8043814903</TelephoneNumber>
+                                            <TelephoneNumber>8043814905</TelephoneNumber>
+                                            <TelephoneNumber>8043814864</TelephoneNumber>
+                                            <TelephoneNumber>8043326094</TelephoneNumber>
+                                            <TelephoneNumber>8042121771</TelephoneNumber>
+                                            <TelephoneNumber>8043024182</TelephoneNumber>
+                                            <!-- SNIP -->        
+                                            <TelephoneNumber>8043814900</TelephoneNumber>
+                                            <TelephoneNumber>8047672642</TelephoneNumber>
+                                            <TelephoneNumber>8043024368</TelephoneNumber>
+                                            <TelephoneNumber>8042147950</TelephoneNumber>
+                                            <TelephoneNumber>8043169931</TelephoneNumber>
+                                            <TelephoneNumber>8043325302</TelephoneNumber>
+                                        </TelephoneNumbers>
+                                    </TNs>
+            
+                    204:
+                        description: No Content - there are no numbers found using the search parameters
+                    404:
+                        description: Not Found - The search parameters are invalid and prevent finding any content      
+
+        /lnpchecker: 
+            
+            description: | 
+                The lnpchecker resource performs a portability analysis for a set ot TNs, returning information about the coverage and losing carrier characteristics of the TNs allowing a better assessment of which port requests to submit.
+            
+            post:
+                description: |
+                    Request portability information on a set of TNs 
+                queryParameters:
+                    fullCheck:
+                        type: boolean
+                        description: | 
+                            if fullCheck=true is specified, additional information will be provided on the losing carriers associated with the listed numbers
+                        default: false
+                body:
+                    application/xml:
+                        example: |
+                            <NumberPortabilityRequest>
+                               <TnList>                <--! the list of the TNs to check for Portability -->
+                                  <Tn>4109255199</Tn>
+                                  <Tn>4109235436</Tn>
+                                  <Tn>4104685864</Tn>
+                                  <Tn>4103431313</Tn>
+                                  <Tn>4103154313</Tn>
+                                  <Tn>4103431561</Tn>
+                               </TnList>
+                            </NumberPortabilityRequest>
+                responses:
+                    200:
+                        description: A successful check has been performed.
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <NumberPortabilityResponse>
+                                        <SupportedRateCenters/>
+                                        <UnsupportedRateCenters>
+                                            <RateCenterGroup>
+                                                <RateCenter>BALTIMORE</RateCenter>
+                                                <City>BALTIMORE</City>
+                                                <State>MD</State>
+                                                <LATA>238</LATA>
+                                                <TnList>
+                                                    <Tn>4109255199</Tn>
+                                                    <Tn>4104685864</Tn>
+                                                </TnList>
+                                            </RateCenterGroup>
+                                            <RateCenterGroup>
+                                                <RateCenter>SPARKSGLNC</RateCenter>
+                                                <City>SPARKS GLENCOE</City>
+                                                <State>MD</State>
+                                                <LATA>238</LATA>
+                                                <TnList>
+                                                    <Tn>4103431313</Tn>
+                                                    <Tn>4103431561</Tn>
+                                                </TnList>
+                                            </RateCenterGroup>
+                                        </UnsupportedRateCenters>
+                                        <SupportedLosingCarriers>
+                                            <LosingCarrierTnList>
+                                                <LosingCarrierSPID>9998</LosingCarrierSPID>
+                                                <LosingCarrierName>Test Losing Carrier L3</LosingCarrierName>
+                                                <TnList>
+                                                    <Tn>4109255199</Tn>
+                                                    <Tn>4104685864</Tn>
+                                                    <Tn>4103431313</Tn>
+                                                    <Tn>4103431561</Tn>
+                                                </TnList>
+                                            </LosingCarrierTnList>
+                                        </SupportedLosingCarriers>
+                                        <UnsupportedLosingCarriers/>
+                                    </NumberPortabilityResponse>
+            
+                    400:
+                        description: Bad Response - there were errors in evaluating the body of the request
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <NumberPortabilityResponse>
+                                        <Errors>
+                                            <Code>7201</Code>
+                                            <Description>61746052083 is not a valid NANPA telephone number.</Description>
+                                        </Errors>
+                                        <Errors>
+                                            <Code>7201</Code>
+                                            <Description>61746052082 is not a valid NANPA telephone number.</Description>
+                                        </Errors>
+                                    </NumberPortabilityResponse>
+                
+            
+            #  The resource tree that follows the root can be placed here.
+            # values in curly braces will appear as fillable parameters in the URL
+            # remember to fix these / delete these until the files are really there.
+
+
+
+/tns: 
+    
+    description: Telephone Numbers (TNs) are similarly central to Bandwidth Dashboard provisioning.  TNs can be queried on a system-wide basis, returning information based on a wide range of search parameters.
+    
+    get:
+        description: | 
+            Retrieve information about one or more Telephone Numbers (TNs), where the TNs are chosen based on the search parameters provided in the API Call. 
+        queryParameters:
+            page:
+                description: An ID of the first element in a page.  This value will indicate the first value, not the count, of the initial entry in the page being requested.  Note in the example that the page is the TN that begins the page. The initial page is tagged with the ID '1'
+                type: string
+                example: 9199918388
+                default: 1
+                required: true
+            size:
+                description: The number of items to include in a page
+                type: integer
+                example: 250
+                default: 500
+                required: true
+            accountId:
+                description: The internal account id assigned to the customer that "owns" the TN
+                type: integer
+                example: 5000125
+            status:
+                description: | 
+                    A status value to filter the TNs returned in the payload.  Values that can be accepted include:
+                    * Available
+                    * InService
+                    * Aging
+                    * Backordered
+                    * Obsolete (future)
+                type: string
+                enum: [Available,InService,Aging,Backordered,Obsolete]
+                example: Available
+            fullNumber:
+                description: A 10 Digit TN
+                type: string
+                example: 9199918388
+            tier:
+                description: A service tier indicating the the vendor class that the TN is associated with.  Tier indicates whether the TN is on-net, domestic offnet, Canadian, etc.
+                type: integer
+                example: 5       
+            lata:
+                description: The LATA (Local Access Transport Area) that the TN is served from, typically 3 digits (5 in FLA)
+                type: integer
+                example: 423
+            rateCenter:
+                description: The Rate Center designation that the number is served from.  If not combined with a State search the results will span states.
+                type: string
+                example: RALEIGH
+            npa:
+                description: The first 3 digits of a 10 Digit NA Telephone Number, the Area Code.
+                type: string
+                example: 919
+            npaNxx:
+                description: The first 6 digits of a 10 Digit NA Telephone Number.
+                type: string
+                example: 919991
+            npaNxxX:
+                description: The first 7 digits of a 10 Digit NA Telephone Number.
+                type: string
+                example: 9199918
+            state:
+                description: A 2 character State or Province designation - TX for Texas for example
+                type: string
+                example: TX
+            city:
+                description: The geographic city most likely to serve the Telephone Number.  City and other geographic data is determined statistically, and is not as reliable as Rate Center information for pinpointing the service location of a TN
+                example: CARY
+            Host:
+                description: An IP address associated with the TN
+                type: string
+                example: 47.16.211.63
+        responses:    
+            200:
+                description: |
+                    The descriptive payload for the TNs query provides information about the TN(s) that were found in the Query. Information about the City, State, LATA, Rate Center, Tier, Vendor, Status, Owning Account and Last Modified Date is provided for each TN in the payload.
+    
+                    Links to assist in pagination are also provided.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <TelephoneNumbersResponse>
+                                <TelephoneNumberCount>5</TelephoneNumberCount>
+                                <Links>
+                                    <first>
+                                        Link=<https://api.inetwork.com:443/v1.0/tns?npaNxx=919238&size=5&page=1>;rel="first";
+                                    </first>
+                                    <next>
+                                        Link=<https://api.inetwork.com:443/v1.0/tns?npaNxx=919238&size=5&page=9192381144>;rel="next";
+                                    </next>
+                                </Links>
+                                <TelephoneNumbers>
+                                    <TelephoneNumber>
+                                        <City>CARY</City>
+                                        <Lata>426</Lata>
+                                        <State>NC</State>
+                                        <FullNumber>9192381138</FullNumber>
+                                        <Tier>0</Tier>
+                                        <VendorId>49</VendorId>
+                                        <VendorName>Bandwidth CLEC</VendorName>
+                                        <RateCenter>CARY</RateCenter>
+                                        <Status>Inservice</Status>
+                                        <AccountId>9900008</AccountId>
+                                        <LastModified>2013-12-05T05:58:27.000Z</LastModified>
+                                    </TelephoneNumber>
+                                    <TelephoneNumber>
+                                        <City>CARY</City>
+                                        <Lata>426</Lata>
+                                        <State>NC</State>
+                                        <FullNumber>9192381139</FullNumber>
+                                        <Tier>0</Tier>
+                                        <VendorId>49</VendorId>
+                                        <VendorName>Bandwidth CLEC</VendorName>
+                                        <RateCenter>CARY</RateCenter>
+                                        <Status>Inservice</Status>
+                                        <AccountId>9900000</AccountId>
+                                        <LastModified>2013-12-05T05:58:27.000Z</LastModified>
+                                    </TelephoneNumber>
+                                    <TelephoneNumber>
+                                        <City>CARY</City>
+                                        <Lata>426</Lata>
+                                        <State>NC</State>
+                                        <FullNumber>9192381141</FullNumber>
+                                        <Tier>0</Tier>
+                                        <VendorId>49</VendorId>
+                                        <VendorName>Bandwidth CLEC</VendorName>
+                                        <RateCenter>CARY</RateCenter>
+                                        <Status>Inservice</Status>
+                                        <AccountId>9900000</AccountId>
+                                        <LastModified>2013-12-05T05:58:27.000Z</LastModified>
+                                    </TelephoneNumber>
+                                    <TelephoneNumber>
+                                        <City>CARY</City>
+                                        <Lata>426</Lata>
+                                        <State>NC</State>
+                                        <FullNumber>9192381142</FullNumber>
+                                        <Tier>0</Tier>
+                                        <VendorId>49</VendorId>
+                                        <VendorName>Bandwidth CLEC</VendorName>
+                                        <RateCenter>CARY</RateCenter>
+                                        <Status>Inservice</Status>
+                                        <AccountId>9900000</AccountId>
+                                        <LastModified>2013-12-05T05:58:27.000Z</LastModified>
+                                    </TelephoneNumber>
+                                    <TelephoneNumber>
+                                        <City>CARY</City>
+                                        <Lata>426</Lata>
+                                        <State>NC</State>
+                                        <FullNumber>9192381144</FullNumber>
+                                        <Tier>0</Tier>
+                                        <VendorId>49</VendorId>
+                                        <VendorName>Bandwidth CLEC</VendorName>
+                                        <RateCenter>CARY</RateCenter>
+                                        <Status>Aging</Status>
+                                        <AccountId>753</AccountId>
+                                        <LastModified>2013-12-05T05:58:27.000Z</LastModified>
+                                    </TelephoneNumber>
+                                </TelephoneNumbers>
+                            </TelephoneNumbersResponse>
+            400:
+                description: |
+                    Bad Request - any syntax error in the parameters will cause a 400 error with a payload similar to the payload in the example, with an error code and text description.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                            <TelephoneNumbersResponse>
+                                <ResponseStatus>
+                                    <ErrorCode>15511</ErrorCode>
+                                    <Description>The NPA_NXX '9192384' is invalid</Description>
+                                </ResponseStatus>
+                            </TelephoneNumbersResponse> 
+
+/orders: 
+    
+    description: |
+        New number orders track the assignment of TNs to Accounts, and comprise the most common use of the Bandwidth Dashboard API.
+        The *+orders+* global search API will search the system for new number orders, filtered by a wide range of filter parameters.
+        
+    get:
+        description: |
+            Retrieve information about one or more Port-in Orders (portins), where the orders are chosen based on the search parameters provided in the API Call. 
+            Not all search parameters are compatible with all other search parameters, due to the complexity of searching for historical records using highly parameterized or complex searches.  As a result:
+            * all query parameters are compatible with the exception of...
+            ** if modifiedFromDate or modifiedToDate are specified, then the only other valid search parameters are accountId, sippeerId or siteId
+            ** sippeerId and siteId are only compatible with searches that have a date range parameter.
+        queryParameters:
+            accountId:
+                description: This is the account that the searched-for order will be contributing to.  Specifying this parameter will restrict the search to portin orders within the specified account.
+                type: integer
+                example: 9900012
+                repeat: true
+            status:
+                description: The status of the portin order being searched for.
+                type: string
+                example: EXCEPTION
+                enum: [SUBMITTED, EXCEPTION, FOC, CANCELLED, COMPLETE]
+                repeat: true
+            telephoneNumber:
+                description: A Telephone Number (TN) that is referenced in the order - a TN ported by the Port Order
+                type: string
+                example: 9199918388
+            customerOrderId:
+                description: The Customer Order ID is an ID assigned by the account owner to provide a reference number for the Port.
+                type: string
+                example: ABCCorp12345
+            orderIdFragment:
+                description: This search parameter represents the internal Bandwidth Dashboard ID that has been assigned to the Port Order.  This parameter is the first few characters of the internal ID - the entire ID does not need to be specified.
+                type: string
+                example: ed1c0bed-e2
+            siteId:
+                description: The numeric designation for the Site ID that applied to the Port-in Order.  The SiteId is used to provide a home within the account for the TN(s) that were ported in by the Port-in Order.
+                type: integer
+                example: 645881
+            sippeerId:
+                description: The numeric designation for the Location or SIP PEER ID that applied to the Port-in Order.  The SIP Peer ID is used to provide a home within the location for the TN(s) that were ported in by the Port-in Order.
+                type: integer
+                example: 456
+            activityState:
+                description: The Order-Management state of the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API
+                type: string
+                enum: [quiet, responded, changed, seen]
+                example: responded
+            bandwidthPrime:
+                description: The name of the Bandwidth person responsible for managing the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API.
+                example: GeorgeB
+            modifiedFromDate:
+                description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-22
+            modifiedToDate:
+                description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-25
+        responses:    
+            200:
+                description: |
+                    The descriptive payload for the New number Orders query provides a broad range of information about the New number Orders found by the query, including the data associated with the order, the state of the order, and details about the order if it was successful.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <ResponseSelectWrapper>
+                                <ListOrderIdUserIdDate>
+                                    <TotalCount>2122</TotalCount>
+                                    <OrderIdUserIdDate>
+                                        <accountId>9999999</accountId>
+                                        <CountOfTNs>0</CountOfTNs>
+                                        <lastModifiedDate>2014-02-25T16:02:43.195Z</lastModifiedDate>
+                                        <OrderDate>2014-02-25T16:02:43.195Z</OrderDate>
+                                        <orderId>abe36738-6929-4c6f-926c-88e534e2d46f</orderId>
+                                        <OrderStatus>FAILED</OrderStatus>
+                                        <TelephoneNumberDetails/>
+                                        <userId>team_ua</userId>
+                                    </OrderIdUserIdDate>
+                                    <OrderIdUserIdDate>
+                                        <accountId>9999999</accountId>
+                                        <CountOfTNs>0</CountOfTNs>
+                                        <lastModifiedDate>2014-02-25T16:02:40.628Z</lastModifiedDate>
+                                        <OrderDate>2014-02-25T16:02:40.628Z</OrderDate>
+                                        <orderId>18427880-33a9-4282-a196-f740c720bb9e</orderId>
+                                        <OrderStatus>FAILED</OrderStatus>
+                                        <TelephoneNumberDetails/>
+                                        <userId>team_ua</userId>
+                                    </OrderIdUserIdDate>
+    
+                                    ...SNIP...
+    
+                                    <OrderIdUserIdDate>
+                                        <accountId>9999999</accountId>
+                                        <CountOfTNs>0</CountOfTNs>
+                                        <lastModifiedDate>2014-02-25T16:02:39.345Z</lastModifiedDate>
+                                        <OrderDate>2014-02-25T16:02:39.345Z</OrderDate>
+                                        <orderId>d7eff0d8-303c-4f11-86f8-44740bbd4535</orderId>
+                                        <OrderStatus>FAILED</OrderStatus>
+                                        <userId>team_ua</userId>
+                                    </OrderIdUserIdDate>
+                                    <OrderIdUserIdDate>
+                                        <accountId>9999999</accountId>
+                                        <CountOfTNs>0</CountOfTNs>
+                                        <lastModifiedDate>2014-02-25T16:02:39.021Z</lastModifiedDate>
+                                        <OrderDate>2014-02-25T16:02:39.021Z</OrderDate>
+                                        <orderId>ba5b6297-139b-4430-aab0-9ff02c4362f4</orderId>
+                                        <OrderStatus>FAILED</OrderStatus>
+                                        <userId>team_ua</userId>
+                                    </OrderIdUserIdDate>
+                                </ListOrderIdUserIdDate>
+                            </ResponseSelectWrapper>
+            404:
+                description: Not Found.  If any errors are found in the processing of the query string a 404 will be returned.  Note that parameters that are not recognized are not considered errors, and are just ignored. 
+
+/portins: 
+    
+    description: |
+        Port-Ins are perhaps the most critical order-type managed by the Bandwidth Dashboard.  The Port-in order type is used to manage the porting of numbers into the Bandwidth CLEC network, and as such are responsible for managing and tracking the most complex business process in the CLEC provisioning domain.
+        The portins resource is representative of the set of all Port-in orders ( for all accounts ) managed by the Bandwidth Dashboard.
+        This API is used to search that set of records.
+    get:
+        description: |
+            Retrieve information about one or more Port-in Orders (portins), where the orders are chosen based on the search parameters provided in the API Call. 
+        queryParameters:
+            accountId:
+                description: This is the account that the searched-for order will be contributing to.  Specifying this parameter will restrict the search to portin orders within the specified account.
+                type: integer
+                example: 9900012
+                repeat: true
+            status:
+                description: The status of the portin order being searched for.
+                type: string
+                example: EXCEPTION
+                enum: [SUBMITTED, EXCEPTION, FOC, CANCELLED, COMPLETE]
+                repeat: true
+            telephoneNumber:
+                description: A Telephone Number (TN) that is referenced in the order - a TN ported by the Port Order
+                type: string
+                example: 9199918388
+            pon:
+                description: The PON that is referenced in the Port Order.  A PON is a number assigned to the Port-in Order as part of the porting process by the partner or winner to aid in the identificatoin of a Port Order.
+                type: string
+                example: Available
+            btn:
+                description: The BTN (Business Telephone Number) is typically the telephone number associated with the business owner of the TN.
+                type: string
+                example: 9199918388
+            customerOrderId:
+                description: The Customer Order ID is an ID assigned by the account owner to provide a reference number for the Port.
+                type: string
+                example: ABCCorp12345
+            orderIdFragment:
+                description: This search parameter represents the internal Bandwidth Dashboard ID that has been assigned to the Port Order.  This parameter is the first few characters of the internal ID - the entire ID does not need to be specified.
+                type: string
+                example: ed1c0bed-e2
+            requestedFocDate:
+                description: This is the FOC (Final Order Commit) Date requested by the person (or machine) creating the Port-in Order.
+                type: string
+                example: 13-10-22
+            actualFocDate:
+                description: This is the FOC (Final Order Commit) Date assigned to the Port-in Order by the loosing carrier or their agent.
+                type: string
+                example: 13-10-22
+            lastModifiedBy:
+                description: This is the user-id of the user that last modified the Port-in Order.
+                type: string
+                example: smckinnon
+            siteId:
+                description: The numeric designation for the Site ID that applied to the Port-in Order.  The SiteId is used to provide a home within the account for the TN(s) that were ported in by the Port-in Order.
+                type: integer
+                example: 645881
+            sippeerId:
+                description: The numeric designation for the Location or SIP PEER ID that applied to the Port-in Order.  The SIP Peer ID is used to provide a home within the location for the TN(s) that were ported in by the Port-in Order.
+                type: integer
+                example: 456
+            activityState:
+                description: The Order-Management state of the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API
+                type: string
+                enum: [quiet, responded, changed, seen]
+                example: responded
+            bandwidthPrime:
+                description: The name of the Bandwidth person responsible for managing the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API.
+                type: string
+                example: GeorgeB
+            lastModifiedFromDate:
+                description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-22
+            lastModifiedToDate:
+                description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-25
+        responses:    
+            200:
+                description: |
+                    The descriptive payload for the Port-in Orders query provides a broad range of information about the Port-in Orders found by the query, including the data associated with the order, the state of the order, and information about any error conditions encountered in processing of the order
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <LNPResponseWrapper>
+                                <TotalCount>20</TotalCount>
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>2</accountId>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-02-10T12-52-27.021Z</lastModifiedDate>
+                                    <LNPLosingCarrierId>1537</LNPLosingCarrierId>
+                                    <LNPLosingCarrierName>Test Losing Carrier L3</LNPLosingCarrierName>
+                                    <OrderDate>2013-11-19T22-29-01.336Z</OrderDate>
+                                    <OrderId>7b08cec0-390b-4a27-a30f-3bcb8876cb8e</OrderId>
+                                    <ProcessingStatus>CANCELLED</ProcessingStatus>
+                                    <RequestedFOCDate>2013-11-25T13-00-00.000Z</RequestedFOCDate>
+                                    <userId>jbm</userId>
+                                    <VendorId>49</VendorId>
+                                    <VendorName>Bandwidth CLEC</VendorName>
+                                </lnpPortInfoForGivenStatus>
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>1</accountId>
+                                    <BillingTelephoneNumber>3125462291</BillingTelephoneNumber>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-02-04T19-41-15.313Z</lastModifiedDate>
+                                    <Errors>
+                                        <Error>
+                                            <Code>7300</Code>
+                                            <Description>
+                                                The order cannot be modified because the order is awaiting a response from the losing carrier
+                                            </Description>
+                                        </Error>
+                                    </Errors>
+                                    <LNPLosingCarrierId>1536</LNPLosingCarrierId>
+                                    <LNPLosingCarrierName>Neustar Test Carrier</LNPLosingCarrierName>
+                                    <OrderId>792f12d4-2367-4282-9cec-7b4f92b75eeb</OrderId>
+                                    <ProcessingStatus>REQUESTED_SUPP</ProcessingStatus>
+                                    <RequestedFOCDate>2014-02-05T19-36-13.000Z</RequestedFOCDate>
+                                    <userId>jbm</userId>
+                                    <VendorId>49</VendorId>
+                                    <VendorName>Bandwidth CLEC</VendorName>
+                                    <PON>979E0122150001D5</PON>
+                                </lnpPortInfoForGivenStatus>
+                                <lnpPortInfoForGivenStatus> ... </lnpPortInfoForGivenStatus>
+                                ... snip ...
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>1</accountId>
+                                    <BillingTelephoneNumber>6882011401</BillingTelephoneNumber>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-02-16T13-51-06.417Z</lastModifiedDate>
+                                    <Errors>
+                                        <Error>
+                                            <Code>7205</Code>
+                                            <Description>
+                                                Telephone number is already being processed on another order
+                                            </Description>
+                                        </Error>
+                                    </Errors>
+                                    <LNPLosingCarrierId>1536</LNPLosingCarrierId>
+                                    <LNPLosingCarrierName>Neustar Test Carrier</LNPLosingCarrierName>
+                                    <OrderDate>2014-02-16T13-51-05.697Z</OrderDate>
+                                    <OrderId>af1df8a9-4d6f-4d23-a7c5-ef7d1561af26</OrderId>
+                                    <ProcessingStatus>CANCELLED</ProcessingStatus>
+                                    <RequestedFOCDate>2014-02-17T13-51-06.056Z</RequestedFOCDate>
+                                    <userId>jbm</userId>
+                                    <VendorId>49</VendorId>
+                                    <VendorName>Bandwidth CLEC</VendorName>
+                                </lnpPortInfoForGivenStatus>
+                            </LNPResponseWrapper>
+            404:
+                description: Not Found.  If any errors are found in the processing of the query string a 404 will be returned.  Note that parameters that are not recognized are not considered errors, and are just ignored. 
+
+/portouts: 
+    
+    description: |
+        Port out records represent the work that (typically) already been done to remove a TN from our system.  
+        The ability to search the set of all port-out work orders allows us to validate that removing numbers from the account
+        was done correctly.
+    
+    get:
+        description: |
+            Retrieve information about one or more Port-in Orders (portins), where the orders are chosen based on the search parameters provided in the API Call. 
+            Not all search parameters are compatible with all other search parameters, due to the complexity of searching for historical records using highly parameterized or complex searches.  As a result:
+            * all query parameters are compatible with the exception of...
+            ** if modifiedFromDate or modifiedToDate are specified, then the only other valid search parameters are accountId, sippeerId or siteId
+            ** sippeerId and siteId are only compatible with searches that have a date range parameter.
+        queryParameters:
+            accountId:
+                description: This is the account that the searched-for order will be contributing to.  Specifying this parameter will restrict the search to portin orders within the specified account.
+                type: integer
+                example: 9900012
+                repeat: true
+            status:
+                description: The status of the portin order being searched for.
+                type: string
+                example: EXCEPTION
+                enum: [SUBMITTED, EXCEPTION, FOC, CANCELLED, COMPLETE]
+                repeat: true
+            telephoneNumber:
+                description: A Telephone Number (TN) that is referenced in the order - a TN ported by the Port Order
+                type: string
+                example: 9199918388
+            orderIdFragment:
+                description: This search parameter represents the internal Bandwidth Dashboard ID that has been assigned to the Port Order.  This parameter is the first few characters of the internal ID - the entire ID does not need to be specified.
+                type: string
+                example: ed1c0bed-e2
+            requestedFocDate:
+                description: This is the FOC (Final Order Commit) Date requested by the person (or machine) creating the Port-in Order.
+                type: string
+                example: 13-10-22
+            actualFocDate:
+                description: This is the FOC (Final Order Commit) Date assigned to the Port-in Order by the loosing carrier or their agent.
+                type: string
+                example: 13-10-22
+            lastModifiedBy:
+                description: This is the user-id of the user that last modified the Port-in Order.
+                type: string
+                example: smckinnon
+            activityState:
+                description: The Order-Management state of the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API
+                type: string
+                enum: [quiet, responded, changed, seen]
+                example: responded
+                repeat: true
+            bandwidthPrime:
+                description: The name of the Bandwidth person responsible for managing the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API.
+                type: string
+                example: GeorgeB
+                repeat: true
+            modifiedFromDate:
+                description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-22
+            modifiedToDate:
+                description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                type: string
+                example: 13-10-25
+        responses:    
+            200:
+                description: |
+                    The descriptive response payload for the Port-out Orders query provides a broad range of information about the Port-out Orders found by the query, including the data associated with the order, the status of the order, and information about any error conditions encountered in processing of the order
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <LNPResponseWrapper>
+                                <TotalCount>1520</TotalCount>
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>14</accountId>
+                                    <CompanyName>CWI Hosting</CompanyName>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-02-07T21-11-10.278Z</lastModifiedDate>
+                                    <ErrorCode>200</ErrorCode>
+                                    <ErrorMessage>Cancel pre foc port in successful.</ErrorMessage>
+                                    <FullNumber>3232017829</FullNumber>
+                                    <OrderId>7ff2652e-8ef3-4120-9df9-96f80b5bdcda</OrderId>
+                                    <ProcessingStatus>cancelled</ProcessingStatus>
+                                    <RequestedFOCDate>2114-02-07T00-00-00.000Z</RequestedFOCDate>
+                                    <userId>jbm</userId>
+                                    <VendorId>512E</VendorId>
+                                </lnpPortInfoForGivenStatus>
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>14</accountId>
+                                    <CompanyName>CWI Hosting</CompanyName>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-01-10T17-50-10.148Z</lastModifiedDate>
+                                    <ErrorCode>200</ErrorCode>
+                                    <ErrorMessage>Cancel pre foc port in successful.</ErrorMessage>
+                                    <FullNumber>2012001665</FullNumber>
+                                    <OrderId>7fd0682c-6cba-47fd-9cb1-1e4e60f3467c</OrderId>
+                                    <ProcessingStatus>cancelled</ProcessingStatus>
+                                    <RequestedFOCDate>2014-01-30T00-00-00.000Z</RequestedFOCDate>
+                                    <userId>jbm</userId>
+                                    <VendorId>512E</VendorId>
+                                </lnpPortInfoForGivenStatus>
+    
+                                ... SNIP ...
+    
+                                <lnpPortInfoForGivenStatus>
+                                    <accountId>14</accountId>
+                                    <CompanyName>CWI Hosting</CompanyName>
+                                    <CountOfTNs>1</CountOfTNs>
+                                    <lastModifiedDate>2014-01-29T11-21-00.525Z</lastModifiedDate>
+                                    <ErrorCode>200</ErrorCode>
+                                    <ErrorMessage>Port out successful.</ErrorMessage>
+                                    <FullNumber>2052870789</FullNumber>
+                                    <OrderId>7fc7950b-8b36-4db6-8a5c-8c1280635048</OrderId>
+                                    <ProcessingStatus>complete</ProcessingStatus>
+                                    <RequestedFOCDate>2014-01-31T00-00-00.000Z</RequestedFOCDate>
+                                    <userId>Neustar</userId>
+                                    <VendorId>979E</VendorId>
+                                    <PON>14214124</PON>
+                                </lnpPortInfoForGivenStatus>
+                            </LNPResponseWrapper>
+            404:
+                description: Not Found.  If any errors are found in the processing of the query string a 404 will be returned.  Note that parameters that are not recognized are not considered errors, and are just ignored. 
+
+/cities: 
+    description: |
+        The *+cities+* resource returns all of the Cities in the indicated State that are supported from a coverage perspective, and that contain orderable inventory.  The values returned indicate the names of the Cities and, if available is specified, returns the available inventory by City.  Note that the mapping between Rate Center and City is not completely predictable because multiple cities can be served by a single Rate Center and it may take multiple Rate Centers to serve a city.  The Rate Centers results are more predictable because of the way that the City coverage data is maintained.
+    get:
+        
+        queryParameters:
+            state:
+                displayName: State
+                type: string
+                description: 2 character state code.
+                example: NC
+                required: true
+            available:
+                displayName: available 
+                type: boolean
+                description: |
+                    true if the desired outcome is to filter the result and only show *available* cities.  
+                    If available is chosen then the result also includes an indication of the number of 
+                    available numbers in that city
+                example: true
+                required: false
+            supported:
+                displayName: supported 
+                type: boolean
+                description: |
+                    true if the desired outcome is to show cities that Bandwidth can serve.  
+                example: true
+                required: false
+        responses:
+            200:
+                description: | 
+                    This response returns the list of cities, along with the Rate Centers that serve those Cities.  If +available+ is specified then the number of TNs available in that city / RC combination is also included.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <CityResponse>
+                                <ResultCount>449</ResultCount>
+                                <Cities>
+                                    <City>
+                                        <RcAbbreviation>DOUGLAS</RcAbbreviation>
+                                        <Name>ADAMS</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>FILLEY</RcAbbreviation>
+                                        <Name>ADAMS</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>AINSWORTH</RcAbbreviation>
+                                        <Name>AINSWORTH</Name>
+                                    </City>
+    
+                                    ... SNIP ...
+    
+                                    <City>
+                                        <RcAbbreviation>LONG PINE</RcAbbreviation>
+                                        <Name>AINSWORTH</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>ODELL</RcAbbreviation>
+                                        <Name>WYMORE</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>BRADSHAW</RcAbbreviation>
+                                        <Name>YORK</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>YORK</RcAbbreviation>
+                                        <Name>YORK</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>WACO</RcAbbreviation>
+                                        <Name>YORK</Name>
+                                    </City>
+                                </Cities>
+                            </CityResponse>
+    
+                            OR.....
+    
+                            <?xml version="1.0"?>
+                            <CityResponse>
+                                <ResultCount>129</ResultCount>
+                                <Cities>
+                                    <City>
+                                        <RcAbbreviation>FILLEY</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>266</AvailableTelephoneNumberCount>
+                                        <Name>ADAMS</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>DOUGLAS</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>378</AvailableTelephoneNumberCount>
+                                        <Name>ADAMS</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>WAKEFIELD</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>272</AvailableTelephoneNumberCount>
+                                        <Name>ALLEN</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>ASHLAND</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>129</AvailableTelephoneNumberCount>
+                                        <Name>ASHLAND</Name>
+                                    </City>
+    
+                                    ... SNIP ...
+    
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>WEST POINT</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>85</AvailableTelephoneNumberCount>
+                                        <Name>WEST POINT</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>OAKLAND</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>290</AvailableTelephoneNumberCount>
+                                        <Name>WEST POINT</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>WESTERN</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>134</AvailableTelephoneNumberCount>
+                                        <Name>WESTERN</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>WAYNE</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>434</AvailableTelephoneNumberCount>
+                                        <Name>WINSIDE</Name>
+                                    </City>
+                                    <City>
+                                        <RcAbbreviation>BRADSHAW</RcAbbreviation>
+                                        <AvailableTelephoneNumberCount>274</AvailableTelephoneNumberCount>
+                                        <Name>YORK</Name>
+                                    </City>
+                                </Cities>
+                            </CityResponse>
+
+/rateCenters: 
+    description: |
+        The rateCenters resource returns all of the Rate Centers in the indicated State that are supported from a coverage perspective, and that contain orderable inventory.  The values returned indicate the names of the Rate Centers and, if available is specified, returns the available inventory by Rate Center.
+    
+    get:
+        
+        queryParameters:
+            state:
+                displayName: State
+                type: string
+                description: 2 character state code.
+                example: NC
+                required: true
+            available:
+                displayName: available 
+                type: boolean
+                description: |
+                    true if the desired outcome is to filter the result and only show *available* cities.  
+                    If available is chosen then the result also includes an indication of the number of 
+                    available numbers in that city
+                example: true
+                required: false
+            supported:
+                displayName: supported 
+                type: boolean
+                description: |
+                    true if the desired outcome is to show cities that Bandwidth can serve.  
+                example: true
+                required: false
+        responses:
+            200:
+                description: | 
+                    This response returns the list of cities, along with the Rate Centers that serve those Cities.  If +available+ is specified then the number of TNs available in that city / RC combination is also included.
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <RateCenterResponse>
+                                <ResultCount>450</ResultCount>
+                                <RateCenters>
+                                    <RateCenter>
+                                        <Abbreviation>ADAMS</Abbreviation>
+                                        <Name>ADAMS</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>AINSWORTH</Abbreviation>
+                                        <Name>AINSWORTH</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>ALBION</Abbreviation>
+                                        <Name>ALBION</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>ALEXANDRIA</Abbreviation>
+                                        <Name>ALEXANDRIA</Name>
+                                    </RateCenter>
+    
+                                    ... SNIP ...
+                                    
+                                    <RateCenter>
+                                        <Abbreviation>WOOD RIVER</Abbreviation>
+                                        <Name>WOOD RIVER</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>WYMORE</Abbreviation>
+                                        <Name>WYMORE</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>WYFRYCSTHL</Abbreviation>
+                                        <Name>WYNOT FORDYCE SAINT HELENA</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>YORK</Abbreviation>
+                                        <Name>YORK</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>YUTAN</Abbreviation>
+                                        <Name>YUTAN</Name>
+                                    </RateCenter>
+                                </RateCenters>
+                            </RateCenterResponse>
+                            
+                            OR.....
+                            
+                            <?xml version="1.0"?>
+                            <RateCenterResponse>
+                                <ResultCount>131</ResultCount>
+                                <RateCenters>
+                                    <RateCenter>
+                                        <Abbreviation>ADAMS</Abbreviation>
+                                        <AvailableTelephoneNumberCount>108</AvailableTelephoneNumberCount>
+                                        <Name>ADAMS</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>ALEXANDRIA</Abbreviation>
+                                        <AvailableTelephoneNumberCount>230</AvailableTelephoneNumberCount>
+                                        <Name>ALEXANDRIA</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>ASHLAND</Abbreviation>
+                                        <AvailableTelephoneNumberCount>129</AvailableTelephoneNumberCount>
+                                        <Name>ASHLAND</Name>
+                                    </RateCenter>
+    
+                                    ... SNIP...
+                                    
+                                    <RateCenter>
+                                        <Abbreviation>WEST POINT</Abbreviation>
+                                        <AvailableTelephoneNumberCount>85</AvailableTelephoneNumberCount>
+                                        <Name>WEST POINT</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>WESTERN</Abbreviation>
+                                        <AvailableTelephoneNumberCount>134</AvailableTelephoneNumberCount>
+                                        <Name>WESTERN</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>WILBER</Abbreviation>
+                                        <AvailableTelephoneNumberCount>135</AvailableTelephoneNumberCount>
+                                        <Name>WILBER</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>WYMORE</Abbreviation>
+                                        <AvailableTelephoneNumberCount>132</AvailableTelephoneNumberCount>
+                                        <Name>WYMORE</Name>
+                                    </RateCenter>
+                                    <RateCenter>
+                                        <Abbreviation>YUTAN</Abbreviation>
+                                        <AvailableTelephoneNumberCount>588</AvailableTelephoneNumberCount>
+                                        <Name>YUTAN</Name>
+                                    </RateCenter>
+                                </RateCenters>
+                            </RateCenterResponse>
+
+/availablenumbers: 
+    description: |
+        Find information about the In Service numbers on the account
+    
+        The inservicenumbers query will return counts all of the inservice numbers on the account, structure in a way that is controlled by a URI "search" parameter.
+    get:
+        description: get a count of the available numbers on the system - structured in a variety of ways. 
+        queryParameters:
+            page:
+                description: the page to fetch in a paginated collection
+                type: integer
+                required: true
+                default: 1
+            size:
+                description: the number of TNs to retrieve in a page
+                type: integer
+                required: true
+                default: 500
+            startdate:
+                description: the starting date for a Date Range in which the Available Numbers are were ordered in the format YY-MM-DD
+                type: string
+                example: 13-05-21
+            enddate:
+                description: the starting date for a Date Range in which the Available Numbers are were ordered in the format YY-MM-DD
+                type: string
+                example: 13-05-21
+            type:
+                description: |
+                    this is the value that governs the structure of the results.  The results payload will be different based on the type value specified.
+    
+                    * NPA - decompose the results by Area Code
+                    * NPANXX - decompose the results by NPA NXX pairings
+                    * NPANXXX - decompose the results by NPA NXX X pairings
+                    * LATA - break the results down by LATA
+                    * RC - break the results down by Rate Center
+                    * ST - break the results down by State
+                enum: [NPA, NPANXX, NPANXXX, LATA, RC, ST]
+                example: NPA
+    
+        responses: 
+            200:
+                description: A successful result that contains the response data
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <TNs>
+                                <TNs>
+                                    <State>AL</State>
+                                    <Tier>0</Tier>
+                                    <Count>5220</Count>
+                                </TNs>
+                                <TNs>
+                                    <State>AR</State>
+                                    <Tier>0</Tier>
+                                    <Count>655</Count>
+                                </TNs>
+                                <TNs>
+                                    <State>AZ</State>
+                                    <Tier>0</Tier>
+                                    <Count>8993</Count>
+                                </TNs>
+    
+                                <TNs>...</TNs>
+                                <TNs>...</TNs>
+                                <!-- SNIP -->
+                                
+                                <TNs>
+                                    <State>WV</State>
+                                    <Tier>0</Tier>
+                                    <Count>324</Count>
+                                </TNs>
+                                <TNs>
+                                    <State>WY</State>
+                                    <Tier>0</Tier>
+                                    <Count>454</Count>
+                                </TNs>
+                            </TNs>
+    
+    
+            204:
+                description: No Content - there are no numbers found using the search parameters
+            404:
+                description: Not Found - The search parameters are invalid and prevent finding any content 
+    
+    
+    /orders: 
+        description: |
+            Find the In Service numbers on the account
+        
+            The inservicenumbers query will return all of the inservice numbers on the account, filtered with a wide range of 
+            search query parameters.  Note that many search combinations will not return a meaningful result because the search 
+            parameters are mutually exclusive.  Since mutually exclusive search criteria result from data that can't  satisfy all of
+            the criteria, these are not flagged as errors, and instead simply return an empty result.
+        
+        get:
+            description: Get a  report on the Import to Available orders
+            queryParameters:
+                page:
+                    description: the page to fetch in a paginated collection
+                    type: integer
+                    required: true
+                    default: 1
+                size:
+                    description: the number of TNs to retrieve
+                    type: integer
+                    required: true
+                    default: 300
+        #        areacode:
+        #            description: An Area Code search filter - all returned TNs will be in the entered Area Code
+        #            type: integer
+        #            example: 919
+        #            minimum: 200
+        #            maximum: 999
+        #        npanxx:
+        #            description: An NPA NXX search filter - all returned TNs will be in the entered NPA NXX dial plan
+        #            type: integer
+        #            example: 919859
+        #            minimum: 200000
+        #            maximum: 999999
+        #        lata:
+        #            description: A LATA search filter - all returned TNs will be in the entered Rate Center.  Typically this is a 3 or 5 digit value
+        #            type: integer
+        #            example: 435
+        #            minimum: 001
+        #            maximum: 99999
+        #        ratecenter:
+        #            description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  This Rate Center must be combined with a State in the query.  If State is not included in the query then the queryu will fail.
+        #            type: string
+        #            example: PLANO
+        
+            responses: 
+                200:
+                    description: A successful result that contains the response data
+                    body: 
+                        application/xml:
+                            example: |
+                                <?xml version="1.0"?>
+                                <ResponseSelectWrapper>
+                                    <ListOrderIdUserIdDate>
+                                        <TotalCount>7</TotalCount>
+                                        <Links>
+                                            <first>
+                                            </first>
+                                        </Links>
+                                        <OrderIdUserIdDate>
+                                            <CountOfTNs>10</CountOfTNs>
+                                            <lastModifiedDate>2012-07-18T13:06:58.000Z</lastModifiedDate>
+                                            <OrderDate>2012-12-05T20:54:54.418Z</OrderDate>
+                                            <orderId>ed1c0bed-e2ba-432d-bb58-81dca35a62ef</orderId>
+                                            <OrderStatus>COMPLETE</OrderStatus>
+                                            <TelephoneNumberDetails>
+                                                <States>
+                                                    <StateWithCount>
+                                                        <State>MD</State>
+                                                        <Count>10</Count>
+                                                    </StateWithCount>
+                                                </States>
+                                                <RateCenters>
+                                                    <RateCenterWithCount>
+                                                        <Count>10</Count>
+                                                        <RateCenter>GAITHERSBG</RateCenter>
+                                                    </RateCenterWithCount>
+                                                </RateCenters>
+                                                <Cities>
+                                                    <CityWithCount>
+                                                        <City>GAITHERSBURG</City>
+                                                        <Count>10</Count>
+                                                    </CityWithCount>
+                                                </Cities>
+                                                <Tiers>
+                                                    <TierWithCount>
+                                                        <Tier>0</Tier>
+                                                        <Count>10</Count>
+                                                    </TierWithCount>
+                                                </Tiers>
+                                                <Vendors>
+                                                    <VendorWithCount>
+                                                        <VendorId>49</VendorId>
+                                                        <Count>10</Count>
+                                                    </VendorWithCount>
+                                                </Vendors>
+                                            </TelephoneNumberDetails>
+                                            <userId>irisuser_nms</userId>
+                                        </OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>...</OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>...</OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>
+                                            <CountOfTNs>0</CountOfTNs>
+                                            <lastModifiedDate>2012-07-17T19:51:57.000Z</lastModifiedDate>
+                                            <OrderDate>2012-12-05T20:54:54.315Z</OrderDate>
+                                            <orderId>8facbdcf-ea51-4527-aace-254a5485a496</orderId>
+                                            <OrderStatus>FAILED</OrderStatus>
+                                            <userId>irisuser_nms</userId>
+                                        </OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>...</OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>...</OrderIdUserIdDate>
+                                        <OrderIdUserIdDate>...</OrderIdUserIdDate>
+                                    </ListOrderIdUserIdDate>
+                                </ResponseSelectWrapper>
+                204:
+                    description: No Content - there are no numbers found using the search parameters
+                404:
+                    description: Not Found - The search parameters are invalid and prevent finding any content   
+        
+        /{orderid}: 
+            description: |
+                Display the data associated with a specific Import to Available Order.
+            
+            get:
+                description: Get the information associated with the identified orderid
+            
+                responses: 
+                    200:
+                        description: A successful result that contains the response data
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0"?>
+                                    <ImportAvailableNumberOrderResponse>
+                                        <accountProfileName>defaultnontfaccount</accountProfileName>
+                                        <gatewayProfileName>defaultnontf</gatewayProfileName>
+                                        <ImportedTelephoneNumberList>
+                                            <TelephoneNumber>3019720000</TelephoneNumber>
+                                            <TelephoneNumber>3019720001</TelephoneNumber>
+                                            <TelephoneNumber>3019720002</TelephoneNumber>
+                                            <TelephoneNumber>3019720003</TelephoneNumber>
+                                            <TelephoneNumber>3019720004</TelephoneNumber>
+                                            <TelephoneNumber>3019720005</TelephoneNumber>
+                                            <TelephoneNumber>3019720006</TelephoneNumber>
+                                            <TelephoneNumber>3019720007</TelephoneNumber>
+                                            <TelephoneNumber>3019720008</TelephoneNumber>
+                                            <TelephoneNumber>3019720009</TelephoneNumber>
+                                        </ImportedTelephoneNumberList>
+                                        <orderRequest>
+                                            <id>ed1c0bed-e2ba-432d-bb58-81dca35a62ef</id>
+                                            <ImportAvailableNumberOrderType>
+                                                <AccountProfile>defaultnontfaccount</AccountProfile>
+                                                <GatewayProfile>defaultnontf</GatewayProfile>
+                                                <TelephoneNumberList>
+                                                    <TelephoneNumber>3019720002</TelephoneNumber>
+                                                    <TelephoneNumber>3019720003</TelephoneNumber>
+                                                    <TelephoneNumber>3019720000</TelephoneNumber>
+                                                    <TelephoneNumber>3019720001</TelephoneNumber>
+                                                    <TelephoneNumber>3019720006</TelephoneNumber>
+                                                    <TelephoneNumber>3019720007</TelephoneNumber>
+                                                    <TelephoneNumber>3019720004</TelephoneNumber>
+                                                    <TelephoneNumber>3019720005</TelephoneNumber>
+                                                    <TelephoneNumber>3019720008</TelephoneNumber>
+                                                    <TelephoneNumber>3019720009</TelephoneNumber>
+                                                </TelephoneNumberList>
+                                                <VendorName>Bandwidth CLEC</VendorName>
+                                            </ImportAvailableNumberOrderType>
+                                        </orderRequest>
+                                    </ImportAvailableNumberOrderResponse>
+            
+                    404:
+                        description: Not Found - The order-id is invalid. 
+
+
+    /totals: 
+        description: |
+            Find the number of In Service numbers on the account, structured in a number of ways
+        
+            This API is used in gathering data that can assist in inventory management, by reporting on the number of TNs in a variety of ways.
+        
+        get:
+            description: Get the total number of available TNs filtered by the search parameters. 
+            queryParameters:
+                areacode:
+                    description: An Area Code search filter - all returned TNs will be in the entered Area Code
+                    type: integer
+                    example: 919
+                    minimum: 200
+                    maximum: 999
+                tier:
+                    description: An Originating Services Tier search filter - Tier 0 - Bandwidth CLEC etc. All returned TNs will be in the entered Tier 
+                    type: integer
+                    example: 0
+                    minimum: 0
+                    maximum: 5
+                npanxx:
+                    description: An NPA NXX search filter - all returned TNs will be in the entered NPA NXX dial plan
+                    type: integer
+                    example: 919859
+                    minimum: 200000
+                    maximum: 999999
+                npanxxx:
+                    description: An NPA NXX X search filter - all returned TNs will be in the entered NPA NXX X dial plan
+                    type: integer
+                    example: 9198592
+                    minimum: 2000000
+                    maximum: 9999999
+                lata:
+                    description: A LATA search filter - all returned TNs will be in the entered Rate Center.  Typically this is a 3 or 5 digit value
+                    type: integer
+                    example: 435
+                    minimum: 001
+                    maximum: 99999
+                state:
+                    description: A State search filter - all returned TNs will be in the entered State.  This is a 2-character State or Province abbreviation
+                    type: string
+                    example: TX
+                city:
+                    description: A City search filter - all returned TNs will be in or around the indicated CIty.  This Rate Center must be combined with a State in the query.  If State is not included in the query then the queryu will fail.
+                    type: string
+                    example: Allen
+                ratecenter:
+                    description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  This Rate Center must be combined with a State in the query.  If State is not included in the query then the queryu will fail.
+                    type: string
+                    example: PLANO
+        
+            responses: 
+                200:
+                    description: A successful result that contains the number of available TNs after the filter is applied.  Parameters that are not understood are ignored, and invalid search terms yield a payload with a count of 0
+                    body: 
+                        application/xml:
+                            example: |
+                                <Quantity>
+                                   <Count>2002</Count>
+                                </Quantity>     
+
+
+/agingnumbers: 
+    
+    description: The Aging Numbers reporting capabilit allows the BDP API Admin user to get paginated lists of TNs in the Aging status.
+    
+    get:
+        description: |
+            Find the list all aging numbers that match the filter serch criteria 
+        queryParameters:
+            page:
+                description: the page to fetch in a paginated collection
+                type: integer
+                required: true
+                default: 1
+            size:
+                description: the number of TNs to retrieve
+                type: integer
+                required: true
+                default: 300
+            areacode:
+                description: An Area Code search filter - all returned TNs will be in the entered Area Code
+                type: integer
+                example: 919
+                minimum: 200
+                maximum: 999
+            npanxx:
+                description: An NPA NXX search filter - all returned TNs will be in the entered NPA NXX dial plan
+                type: integer
+                example: 919859
+                minimum: 200000
+                maximum: 999999
+            lata:
+                description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  Typically this is a 3 or 5 digit value
+                type: integer
+                example: 435
+                minimum: 001
+                maximum: 99999
+            state:
+                description: A State search filter - all returned TNs will be in the entered State.  This is a 2-character State or Province abbreviation
+                type: string
+                example: TX
+            ratecenter:
+                description: A Rate Center search filter - all returned TNs will be in the entered Rate Center.  This Rate Center must be combined with a State in the query.  If State is not included in the query then the queryu will fail.
+                type: string
+                example: TX
+    
+        responses: 
+            200:
+                description: Success in retrieving some numbers that satisfy the query
+                body: 
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <TNs>
+                                <TotalCount>59</TotalCount>
+                                <Links>
+                                    <first> ( a link descriptor ) </first>
+                                </Links>
+                                <TelephoneNumbers>
+                                    <Count>59</Count>
+                                    <TelephoneNumber>8043024183</TelephoneNumber>
+                                    <TelephoneNumber>8042121778</TelephoneNumber>
+                                    <TelephoneNumber>8042146066</TelephoneNumber>
+                                    <TelephoneNumber>8043814903</TelephoneNumber>
+                                    <TelephoneNumber>8043814905</TelephoneNumber>
+                                    <TelephoneNumber>8043814864</TelephoneNumber>
+                                    <TelephoneNumber>8043326094</TelephoneNumber>
+                                    <TelephoneNumber>8042121771</TelephoneNumber>
+                                    <TelephoneNumber>8043024182</TelephoneNumber>
+                                    <!-- SNIP -->        
+                                    <TelephoneNumber>8043814900</TelephoneNumber>
+                                    <TelephoneNumber>8047672642</TelephoneNumber>
+                                    <TelephoneNumber>8043024368</TelephoneNumber>
+                                    <TelephoneNumber>8042147950</TelephoneNumber>
+                                    <TelephoneNumber>8043169931</TelephoneNumber>
+                                    <TelephoneNumber>8043325302</TelephoneNumber>
+                                </TelephoneNumbers>
+                            </TNs>
+    
+            204:
+                description: No Content - there are no numbers found using the search parameters
+            404:
+                description: Not Found - The search parameters are invalid and prevent finding any content      
+
