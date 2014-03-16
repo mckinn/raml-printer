@@ -9,36 +9,29 @@ public class RAMLBody extends RAMLToken {
         RAMLBody () {
         }
 
-        String vaccuumRAMLFIle (Scanner example){
+    String vaccuumRAMLFIle(Scanner example, String currentLine) {
 
-            // RAMLToken theOne;
-            String token;
-            String line;
-            String bodyLines = "";
-            // theOne = new RAMLDescription();
-            token = example.next();
-            String bodyFromFile = "";
-            line = example.nextLine();
-            line = example.nextLine();
-            int lineSpacesCount = lineSpaces(line);
-            int baseLineSpaces = lineSpacesCount - 4;
-            boolean quit = false;
-            String followingLine;
-                do {
-                    if (lineSpacesCount >= 4+baseLineSpaces) {
-                        String lineSegment = line.substring((baseLineSpaces+4),line.length());
-                        bodyLines += lineSegment + "\n";
-                    }
-                    line = example.nextLine();
-                    lineSpacesCount = lineSpaces(line);
-                    if (lineSpacesCount <= baseLineSpaces) {
-                        quit = true;
-                    }
-                    followingLine = line;
-                } while (example.hasNextLine() && !quit);
-            this.bodyContent = bodyLines;
-            return followingLine;
-        }
+        String bodyLines = "";
+
+        int lineSpacesCount = lineSpaces(currentLine);
+        int baseLineSpaces = lineSpacesCount - 4;  // the ending condition
+        boolean quit = false;
+
+        do {
+            if (lineSpacesCount >= 4 + baseLineSpaces) {
+                String lineSegment = currentLine.substring((baseLineSpaces + 4), currentLine.length());
+                bodyLines += lineSegment + "\n";
+            }
+            currentLine = example.nextLine();
+            lineSpacesCount = lineSpaces(currentLine);
+            if (lineSpacesCount <= baseLineSpaces) {
+                quit = true;
+            }
+        } while (example.hasNextLine() && !quit);
+
+        this.bodyContent = bodyLines;
+        return currentLine;
+    }
 
         String formatRAMLasHTML ( RAMLToken toFormat){
             return "RAML as Body";

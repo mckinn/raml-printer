@@ -5,7 +5,7 @@ import java.util.Scanner;
  */
 abstract class RAMLToken {
 
-    abstract String vaccuumRAMLFIle (Scanner example);
+    abstract String vaccuumRAMLFIle (Scanner example, String currentLine);
 
     abstract String formatRAMLasHTML ( RAMLToken toFormat);
 
@@ -32,8 +32,8 @@ abstract class RAMLToken {
             while ((endFirstWord < line.length()) && (line.charAt(endFirstWord) != ' ')) {
                 endFirstWord++;
             }
-            line = line.substring(lineSpacesCount,endFirstWord);
-           return line;
+            line = line.substring(lineSpacesCount, endFirstWord);
+            return line;
         }
     }
  // todo: 1) read in a file and create and populate a single RAMLToken object of any type whatsoever

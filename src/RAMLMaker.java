@@ -12,23 +12,18 @@ public class RAMLMaker {
         // for each of the lines
         // find  a RAML object type:
         //
-        RAMLToken[] tokens = new RAMLToken[10];
-        String[] descriptionArray = new String[10];
+        ArrayList<RAMLToken> tokens = new ArrayList<RAMLToken>();
+
         boolean successful;
         String token = "description:";
         Scanner example = null;
         try {
-            //example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
-            example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
+            example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
+            //example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         String line;
-
-        markupType theTypes [] = markupType.values();
-        for(markupType m : theTypes) {
-            System.out.println(m);
-        }
 
         RAMLToken ramlEntity;
         RAMLDescription RAMLD /* = new RAMLDescription() */;
@@ -40,39 +35,45 @@ public class RAMLMaker {
         int arrayPosition = 0;
         assert example != null;
         line = example.nextLine();
-        //token = example.next();
-        String followingWord = "";
+
+        String followingLine = "";
         int followingWordCheck = 0;
         while (example.hasNextLine()) {
             successful = false;
             ramlEntity = null;
-            if (followingWord.equals("")) {
-                token = example.next();
-            } else {
-                token = followingWord;
+            if (followingLine.equals("")) {
+                followingLine = example.nextLine();
             }
+            Scanner s = new Scanner(followingLine);
+            token = s.next();
+
             switch(markupType.stringToMarkuptype(token)){
                 case description:
                     // create a RAMLDescription object and save it somewhere
                     System.out.println("description***");
                     ramlEntity = new RAMLDescription();
-                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
                     successful = true;
                     break;
                 case httpMethod:
-                    ramlEntity = new RAMLHTTPMethod(token, 10);
-                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
+                    System.out.println("HTTP Method***");
+                    ramlEntity = new RAMLHTTPMethod(token);
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
                     successful = true;
                     break;
                 case body:
                     System.out.println("body***");
                     ramlEntity = new RAMLBody();
-                    followingWord = ramlEntity.vaccuumRAMLFIle(example);
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
                     successful = true;
                     break;
                 case pathElement:
                     break;
                 case applicationXML:
+                    System.out.println("appXML***");
+                    ramlEntity = new RAMLappXml();
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
+                    successful = true;
                     break;
                 case schema:
                     break;
@@ -103,12 +104,18 @@ public class RAMLMaker {
                 case displayName:
                     break;
                 case otcoThorpe:
+                    System.out.println("comment***");
+                    ramlEntity = new RAMLComment();
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
+                    successful = true;
+                    break;
+                case unknown:
                     break;
                 default:
                     System.out.println("default string token = "+token);
             }
             if (successful) {
-                tokens[arrayPosition] = ramlEntity;
+                tokens.add(arrayPosition,ramlEntity);
                 arrayPosition ++;
                 successful = false;
             }
@@ -132,11 +139,11 @@ public class RAMLMaker {
             } */
         }
         for (int i=0; i<arrayPosition; i++) {
-            System.out.println("Slot " + i + " is: " + tokens[i]);
+            System.out.println("Slot " + i + " is: " + tokens.get(i));
         }
         System.out.println();
         for (int i=0; i<arrayPosition; i++) {
-            System.out.println(tokens[i].stringMe());
+            System.out.println(tokens.get(i).stringMe());
         }
     }
 

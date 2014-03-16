@@ -1,8 +1,8 @@
 /{userid}: 
     description: reference a specific user in the Bandwidth Dashboard
-
+# a test comment
     put:
-        
+        # another test comment
         description:  |
             This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the application of these capabilities.
             Note that the resource that is being managed is a set of users, and that the payload reflects that.  POSTing to the users resource permits the creation of multiple user instances as part of a single action.
@@ -18,6 +18,8 @@
                         <EmailAddress>janedoe@bandwidth.com</EmailAddress>
                         <TelephoneNumber>9199999999</TelephoneNumber>
                     </User>
+    application/xml:
+        description: this is a test
     delete:
         description: Delete a User id  
     get:

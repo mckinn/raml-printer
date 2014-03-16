@@ -12,25 +12,27 @@ public class RAMLDescription extends RAMLToken {
         RAMLDescription () {
         }
 
-        String vaccuumRAMLFIle (Scanner example){
+        String vaccuumRAMLFIle (Scanner example, String currentLine){
 
             // RAMLToken theOne;
             String followingWord;
             String token;
             String line;
-            // theOne = new RAMLDescription();
-            token = example.next();
+
+            Scanner s = new Scanner(currentLine);
+            s.next();                        // scan past the first token, which should be description:
+            token = s.next();                // this token should be the pipe, or the start of the next row.
+
             String descriptionFromFile = "";
             if (!token.equals("|")) {
-                line = example.nextLine();
+                line = s.nextLine();         // the text after the non-pipe.
                 descriptionFromFile += token + line;
                 this.theRealDescription = descriptionFromFile;
-                this.pipedContent = true;
-                return example.nextLine();
-                //token = example.next();
+                this.pipedContent = false;
+                return example.nextLine();    // advance the file scanner and return a line.
             } else {
-                line = example.nextLine();
-                line = example.nextLine();
+                line = example.nextLine();    // get to the end of the line todo - what happens if there is no space after the pipe?
+//                line = example.nextLine();
                 int lineSpacesCount = lineSpaces(line);
                 int baseLineSpaces = lineSpacesCount - 4;
                 boolean quit = false;
@@ -68,6 +70,6 @@ public class RAMLDescription extends RAMLToken {
     void spewRAMLFile (String toSave){}
 
     public  String stringMe(){
-        return "Descriptoin: " + theRealDescription;
+        return "Description: " + theRealDescription;
     }
 }

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -5,20 +6,18 @@ import java.util.Scanner;
  */
 public class RAMLHTTPMethod extends RAMLToken{
 
-    RAMLToken [] subtendingThings;
+    ArrayList<RAMLToken> subtendingThings;
     String methodName;
     int numberOfThings;
-    int maxNumberOfThings;
 
-    RAMLHTTPMethod (String typeOfMethod, int max) {
+    RAMLHTTPMethod (String typeOfMethod) {
         methodName = typeOfMethod;
-        maxNumberOfThings = max;
         numberOfThings = 0;
-        subtendingThings = new RAMLToken[max];
+        subtendingThings = new ArrayList<RAMLToken>();
 
     }
 
-    String vaccuumRAMLFIle (Scanner example){
+    String vaccuumRAMLFIle (Scanner example, String currentLine){
 
         // while the number of spaces is current-number + 4
         //     look for a description or a body
@@ -32,8 +31,8 @@ public class RAMLHTTPMethod extends RAMLToken{
         RAMLToken ramlEntity;
         int arrayPosition = 0;
         assert example != null;
-        //line = example.nextLine();
-        String followingLine = "";
+
+        String followingLine = example.nextLine();
         int followingWordCheck = 0;
         int lineSpacesCount = 8;
         int baseLineSpacesCount = lineSpacesCount - 4;
@@ -41,22 +40,23 @@ public class RAMLHTTPMethod extends RAMLToken{
             successful = false;
             ramlEntity = null;
             if (followingLine.equals("")) {
-                token = example.next();
-            } else {
-                token = getFirstWord(followingLine);
+                followingLine = example.nextLine();
             }
+            Scanner s = new Scanner(followingLine);
+            token = s.next();
+
             switch(markupType.stringToMarkuptype(token)){
                 case description:
                     // create a RAMLDescription object and save it somewhere
                     System.out.println("description***");
                     ramlEntity = new RAMLDescription();
-                    followingLine = ramlEntity.vaccuumRAMLFIle(example);
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
                     successful = true;
                     break;
                 case body:
                     System.out.println("body***");
                     ramlEntity = new RAMLBody();
-                    followingLine = ramlEntity.vaccuumRAMLFIle(example);
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
                     successful = true;
                     break;
                 case pathElement:
@@ -92,17 +92,20 @@ public class RAMLHTTPMethod extends RAMLToken{
                 case displayName:
                     break;
                 case otcoThorpe:
+                    ramlEntity = new RAMLComment();
+                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
+                    successful = true;
                     break;
                 default:
                     System.out.println("default string token = "+token);
             }
             if (successful) {
-                subtendingThings[arrayPosition] = ramlEntity;
+                subtendingThings.add(arrayPosition, ramlEntity);
                 arrayPosition ++;
                 successful = false;
             }
             lineSpacesCount = lineSpaces(followingLine);
-            followingLine = getFirstWord(followingLine);
+            // followingLine = getFirstWord(followingLine);
         }
         return followingLine;
     }
@@ -115,9 +118,9 @@ public class RAMLHTTPMethod extends RAMLToken{
 
     public  String stringMe(){
         String returnString = this.methodName + "\n";
-        for (int i=0; i<subtendingThings.length; i++) {
-            if (subtendingThings[i] != null) {
-                returnString += subtendingThings[i].stringMe() + "\n";
+        for (int i=0; i<subtendingThings.size(); i++) {
+            if (subtendingThings.get(i) != null) {
+                returnString += subtendingThings.get(i).stringMe() + "\n";
             }
         }
         return returnString;
