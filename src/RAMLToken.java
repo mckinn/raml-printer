@@ -36,6 +36,20 @@ abstract class RAMLToken {
             return line;
         }
     }
+
+    public static String getNextNonNullString(Scanner example, Boolean preserveBlankLines) {
+        // get the next line to process, eliminating blank lines and comments.
+        String returnValue = example.nextLine();
+        lineOfRamlText thisLine = new lineOfRamlText(returnValue);
+
+        while (((returnValue.equals("") && !preserveBlankLines)|| thisLine.getFirstToken().equals("#"))
+                && example.hasNextLine())
+        {
+            returnValue = example.nextLine();
+            thisLine = new lineOfRamlText(returnValue);
+        }
+        return returnValue;
+    }
  // todo: 1) read in a file and create and populate a single RAMLToken object of any type whatsoever
  // todo: 2) create the main class that reads in an array of RAMLTokens of different types.
 }

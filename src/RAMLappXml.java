@@ -33,25 +33,24 @@ public class RAMLappXml extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        while (((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine())
-                || firstIn) {
+        currentLine = getNextNonNullString(example, true); // the first line of the rest of the payload.
+        importantInformation = new lineOfRamlText(currentLine);
 
-            firstIn = false;
-            currentLine = example.nextLine(); // the first line of the rest of the payload.
-            while (currentLine.equals("")) {
-                currentLine = example.nextLine();
-            }
-            importantInformation = new lineOfRamlText(currentLine);
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
 
             switch(markupType.stringToMarkuptype(importantInformation.getFirstToken())){
                 case description:
                     // create a RAMLDescription object and save it somewhere
-                    System.out.println("description***");
+                    System.out.println("description in application/xml");
                     ramlEntity = new RAMLDescription();
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
                 case example:
+                    System.out.println("example in application/xml");
+                    ramlEntity = new RAMLExample();
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                    successful = true;
                     break;
                 case schema:
                     break;

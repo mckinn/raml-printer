@@ -20,6 +20,21 @@
                     </User>
     application/xml:
         description: this is a test
+        example: |
+            <User>
+
+                <Username>testcustomer</Username>
+                <Password>newpassword</Password>
+                <FirstName>Jane</FirstName>
+
+
+                <LastName>Doe</LastName>
+                <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                # comment
+                <TelephoneNumber>9199999999</TelephoneNumber>
+# comment
+            </User>
+
     delete:
         description: Delete a User id  
     get:
