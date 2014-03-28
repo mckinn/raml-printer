@@ -10,10 +10,10 @@ public class RAMLappXml extends RAMLToken {
     int numberOfThings;
     int indentSpaces ;
 
-    public RAMLappXml() {
+    public RAMLappXml(int is) {
         this.subtendingThings = new ArrayList<RAMLToken>();
         this.numberOfThings = 0;
-        this.indentSpaces = 0;
+        this.indentSpaces = is;
     }
 
     @Override
@@ -33,26 +33,30 @@ public class RAMLappXml extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, true); // the first line of the rest of the payload.
+        currentLine = getNextNonNullString(example, false); // the first line of the rest of the payload.
         importantInformation = new lineOfRamlText(currentLine);
 
         while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
 
             switch(markupType.stringToMarkuptype(importantInformation.getFirstToken())){
+                // todo - create a mut variable and the three cases below can be collapsed into one
                 case description:
-                    // create a RAMLDescription object and save it somewhere
-                    System.out.println("description in application/xml");
-                    ramlEntity = new RAMLDescription();
+//                    System.out.println("description in application/xml");
+                    ramlEntity = new RAMLMultiLine(markupType.description, importantInformation.getLeadingSpaces());
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
                 case example:
-                    System.out.println("example in application/xml");
-                    ramlEntity = new RAMLExample();
+//                    System.out.println("example in application/xml");
+                    ramlEntity = new RAMLMultiLine(markupType.example, importantInformation.getLeadingSpaces());
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
                 case schema:
+//                    System.out.println("example/description in application/xml");
+                    ramlEntity = new RAMLMultiLine(markupType.schema, importantInformation.getLeadingSpaces());
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                    successful = true;
                     break;
                 case unknown:
                     break;
@@ -64,6 +68,8 @@ public class RAMLappXml extends RAMLToken {
                 subtendingThings.add(numberOfThings, ramlEntity);
                 numberOfThings++;
                 successful = false;
+            } else {
+                currentLine = getNextNonNullString(example, false);
             }
 
         }
@@ -83,10 +89,11 @@ public class RAMLappXml extends RAMLToken {
 
     @Override
     public String stringMe() {
-        String returnString = "Application/XML:" + "\n";
+        String returnString = getThisManySpaces(this.indentSpaces) + "Application/XML:" + "\n";
         for (int i=0; i<subtendingThings.size(); i++) {
             if (subtendingThings.get(i) != null) {
-                returnString += subtendingThings.get(i).stringMe() + "\n";
+                returnString += subtendingThings.get(i).stringMe();
+                if (i<(subtendingThings.size()-1)) returnString += '\n';
             }
         }
         return returnString;

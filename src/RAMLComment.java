@@ -11,6 +11,7 @@ public class RAMLComment extends RAMLToken {
 
     public RAMLComment() {
         commentBody = null;
+        assert(false);
     }
 
     public String getCommentBody() {

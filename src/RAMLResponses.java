@@ -1,33 +1,32 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 /**
- * Created by Dad on 3/9/14.
+ * Created by smckinnon on 3/22/14.
  */
-public class RAMLBody extends RAMLToken {
+public class RAMLResponses extends RAMLToken {
 
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;
+    ArrayList<RAMLToken> subtendingThings;  // all will be Responses Values or Descriptions
     int numberOfThings;
 
-    // constructor for the object.
-
-    public RAMLBody(int indentSpaces) {
+    public RAMLResponses(int indentSpaces) {
         this.indentSpaces = indentSpaces;
         this.subtendingThings = new ArrayList<RAMLToken>();
         this.numberOfThings = 0;
     }
 
+    @Override
     String vaccuumRAMLFIle(Scanner example, String currentLine) {
 
         RAMLToken ramlEntity;
         Boolean successful;
         String token;
+        String responseValue;
 
         // extract the indent level from current line.
-        // CurrentLine should contain the body: tag
-        // all that is allowed are descriptions: and application/xml tags.
-        // the pattern is similar to QueryParameters.
+        // CurrentLine should contain the queryParameter: tag
 
         lineOfRamlText importantInformation = new lineOfRamlText(currentLine);
         this.indentSpaces = importantInformation.getLeadingSpaces();
@@ -40,29 +39,27 @@ public class RAMLBody extends RAMLToken {
 
         while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
 
-            // extract the proposed token.  this token should be the first token on the current row,
-            // either description or application/xml.
-            // done
-            // - replace with importantInformation ???
-            // Scanner s = new Scanner(currentLine);
-            // token = s.next();
+            // all of the following tokens are either responses "nnn:" or descriptions
+            // extract the proposed token.  If null then there was an error
 
-            switch(markupType.stringToMarkuptype(importantInformation.getFirstToken())){
-                case description:
-//                    System.out.println("description in body:");
+            token = importantInformation.getFirstToken();
+            responseValue = RAMLResponsesValues.checkResponseCodePattern(token);
+
+            if ( responseValue.equals("")) {  // "description:" is the only valid alternative
+                if (token.equals("description:")) {
+//                    System.out.println("description in Responses");
                     ramlEntity = new RAMLMultiLine(markupType.description, importantInformation.getLeadingSpaces());
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
-                    break;
-                case applicationXML:
-//                    System.out.println("application/xml in body:");
-                    // done RAMLXML needs an indent lines.
-                    ramlEntity = new RAMLappXml(importantInformation.getLeadingSpaces());
-                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
-                    successful = true;
-                    break;
-                default:
-                    System.out.println("Something went wrong in RAMLBody with token: " + importantInformation.getFirstToken());
+                } else {
+                    System.out.println("*** Error: bad token in Responses list: " + token );
+                }
+            } else {
+                // it must be a valid response
+//                System.out.println(token + " in query parameters list");
+                ramlEntity = new RAMLResponsesValues(importantInformation.getLeadingSpaces(), token);
+                currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                successful = true;
             }
 
             importantInformation = new lineOfRamlText(currentLine);
@@ -71,20 +68,26 @@ public class RAMLBody extends RAMLToken {
                 numberOfThings++;
                 successful = false;
             } else {
-                currentLine = getNextNonNullString(example, false) ;
+                currentLine = getNextNonNullString(example, false);
             }
         }
         return currentLine;
+
     }
 
+    @Override
     String formatRAMLasHTML(RAMLToken toFormat) {
-        return "RAML as Body";
+        return null;
     }
 
-    void spewRAMLFile (String toSave){}
+    @Override
+    void spewRAMLFile(String toSave) {
 
-    public  String stringMe() {
-        String returnString = getThisManySpaces(this.indentSpaces) + "Body:" + "\n";
+    }
+
+    @Override
+    public String stringMe() {
+        String returnString = getThisManySpaces(this.indentSpaces) + "responses:" + "\n";
         for (int i=0; i<subtendingThings.size(); i++) {
             if (subtendingThings.get(i) != null) {
                 returnString += subtendingThings.get(i).stringMe();
@@ -93,6 +96,4 @@ public class RAMLBody extends RAMLToken {
         }
         return returnString;
     }
-
-
 }

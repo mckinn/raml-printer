@@ -9,11 +9,13 @@ public class RAMLHTTPMethod extends RAMLToken{
     ArrayList<RAMLToken> subtendingThings;
     String methodName;
     int numberOfThings;
+    int indentSpaces;
 
-    RAMLHTTPMethod (String typeOfMethod) {
+    RAMLHTTPMethod (String typeOfMethod, int ids) {
         methodName = typeOfMethod;
         numberOfThings = 0;
         subtendingThings = new ArrayList<RAMLToken>();
+        indentSpaces = ids;
 
     }
 
@@ -24,90 +26,64 @@ public class RAMLHTTPMethod extends RAMLToken{
         //     call the appropriate vaccuum for the type
         //     place the resulting object in the array
         //
-
-        String line = "";
-        String token = "";
+        String token;
         boolean successful;
         RAMLToken ramlEntity;
-        int arrayPosition = 0;
+
+        this.numberOfThings = 0;
         assert example != null;
 
-        String followingLine = example.nextLine();
-        int followingWordCheck = 0;
-        int lineSpacesCount = 8;
-        int baseLineSpacesCount = lineSpacesCount - 4;
-        while (example.hasNextLine() && lineSpacesCount >= baseLineSpacesCount+4) {
+        lineOfRamlText importantInformation = new lineOfRamlText(currentLine);
+        this.indentSpaces = importantInformation.getLeadingSpaces();
+
+        currentLine = getNextNonNullString(example, false);
+        importantInformation = new lineOfRamlText(currentLine);
+
+        while (example.hasNextLine() && (importantInformation.getLeadingSpaces() > this.indentSpaces)) {
             successful = false;
             ramlEntity = null;
-            if (followingLine.equals("")) {
-                followingLine = example.nextLine();
-            }
-            Scanner s = new Scanner(followingLine);
-            token = s.next();
 
-            switch(markupType.stringToMarkuptype(token)){
+            switch(markupType.stringToMarkuptype(importantInformation.getFirstToken())){
                 case description:
-                    // create a RAMLDescription object and save it somewhere
-                    System.out.println("description***");
-                    ramlEntity = new RAMLDescription();
-                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
+//                    System.out.println("description***");
+                    ramlEntity = new RAMLMultiLine(markupType.description, importantInformation.getLeadingSpaces());
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
                 case body:
-                    System.out.println("body***");
-                    ramlEntity = new RAMLBody();
-                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
+//                    System.out.println("body***");
+                    ramlEntity = new RAMLBody(importantInformation.getLeadingSpaces());
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
-                case pathElement:
-                    break;
-                case applicationXML:
-                    break;
-                case schema:
-                    break;
-                case example:
-                    break;
                 case responses:
-                    break;
-                case responsesvalues:
+//                    System.out.println("Responses ***");
+                    ramlEntity = new RAMLResponses(importantInformation.getLeadingSpaces());
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                    successful = true;
                     break;
                 case queryParameters:
-                    break;
-                case queryParameterNames:
-                    break;
-                case qpType:
-                    break;
-                case qpMaximim:
-                    break;
-                case qpMinimum:
-                    break;
-                case qpRequired:
-                    break;
-                case qpRepeats:
-                    break;
-                case qpDefault:
-                    break;
-                case qpEnum:
-                    break;
-                case displayName:
+                    ramlEntity = new RAMLQueryParameter(importantInformation.getLeadingSpaces());
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                    successful = true;
                     break;
                 case otcoThorpe:
                     ramlEntity = new RAMLComment();
-                    followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
                 default:
-                    System.out.println("default string token = "+token);
+                    System.out.println("default string token = "+ importantInformation.getFirstToken());
             }
             if (successful) {
-                subtendingThings.add(arrayPosition, ramlEntity);
-                arrayPosition ++;
-                successful = false;
+                subtendingThings.add(this.numberOfThings, ramlEntity);
+                this.numberOfThings ++;
+            } else {
+                currentLine = getNextNonNullString(example, false);
             }
-            lineSpacesCount = lineSpaces(followingLine);
-            // followingLine = getFirstWord(followingLine);
+            importantInformation = new lineOfRamlText(currentLine);
         }
-        return followingLine;
+        return currentLine;
     }
 
     String formatRAMLasHTML ( RAMLToken toFormat){
@@ -117,10 +93,11 @@ public class RAMLHTTPMethod extends RAMLToken{
     void spewRAMLFile (String toSave){}
 
     public  String stringMe(){
-        String returnString = this.methodName + "\n";
+        String returnString = getThisManySpaces(this.indentSpaces) + this.methodName + "\n";
         for (int i=0; i<subtendingThings.size(); i++) {
             if (subtendingThings.get(i) != null) {
-                returnString += subtendingThings.get(i).stringMe() + "\n";
+                returnString += subtendingThings.get(i).stringMe();
+                if (i<(subtendingThings.size()-1)) returnString += '\n';
             }
         }
         return returnString;

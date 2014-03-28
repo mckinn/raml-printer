@@ -19,12 +19,22 @@ public class lineOfRamlText {
         this();
         if (!inputLine.equals("")) {
             int i = 0;
-            while (inputLine.charAt(i) == ' ') {
+            while ((i<inputLine.length()) &&(inputLine.charAt(i) == ' ')) {
                 i++;
             }
             this.leadingSpaces = i;
+            if (i >= inputLine.length()) {
+                this.firstToken = "";
+                this.restOfTheLine = "";
+                return;
+            }
             Scanner s = new Scanner(inputLine);
-            this.firstToken = s.next();
+            if ((i<inputLine.length()) && (inputLine.charAt(i) == '#')) {
+                this.firstToken = "#";
+            } else {
+                this.firstToken = s.next();
+            }
+
             if (s.hasNextLine()){
                 this.restOfTheLine = s.nextLine();
             } else {

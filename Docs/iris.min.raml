@@ -190,6 +190,8 @@ securitySchemes:
     description: |
         This API controls the users that have  access to the API and GUI functions exposed by the Bandwidth Dashboard.  Users are described by information about the user themselves, and then by a set of permissions granted them to execute various API and UI functions.  Each of the permissions typically has a View and an Update aspect - a user can be given read-only or read-write access to a function by the applicatoin of these capabilities.
     
+        However, there is no permissions in the response for GET request. Please, refer to detailed description of the GET method to see which fields are included in the response body. 
+    
         Note that the resource that is being managed is a set of users, and that the payload reflects that.  POSTing to the users resource permits the creation of multiple user instances as part of a single action.
     
         Please see the documentation on Users in the description of the Administrative API to the right.
@@ -219,7 +221,7 @@ securitySchemes:
         description: 
             Get a list of all users in the system
     
-            The Payload includes a description of each user, including the user permissions.  User details and a list of customers that the user has access to is only contained in the payload response to a call on a specific user resource
+            The Payload includes a description of each user, without the user permissions. User details and a list of customers that the user has access to is only contained in the payload response to a call on a specific user resource
         responses:
             200:
                 description: The request is valid and a list of users can be returned.
@@ -231,35 +233,17 @@ securitySchemes:
                                 <Users>
                                     <User>
                                         <Username>testcustomer</Username>
-                                        <Roles>
-                                            <Role>
-                                                <RoleName>ROLE_ADMIN</RoleName>
-                                                <Permissions>
-                                                    <Permission>
-                                                        <PermissionName>VIEW</PermissionName>
-                                                    </Permission>
-                                                    <Permission>
-                                                        <PermissionName>UPDATE</PermissionName>
-                                                    </Permission>
-                                                </Permissions>
-                                            </Role>
-                                        </Roles>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
                                     </User>
                                     <User>
                                         <Username>johndoe</Username>
-                                        <Roles>
-                                            <Role>
-                                                <RoleName>ROLE_AGENT</RoleName>
-                                                <Permissions>
-                                                    <Permission>
-                                                        <PermissionName>VIEW</PermissionName>
-                                                    </Permission>
-                                                    <Permission>
-                                                        <PermissionName>UPDATE</PermissionName>
-                                                    </Permission>
-                                                </Permissions>
-                                            </Role>
-                                        </Roles>
+                                        <FirstName>John</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>johndoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999998</TelephoneNumber>
                                     </User>
                                 </Users>
                             </UsersResponse>         
@@ -364,7 +348,7 @@ securitySchemes:
                           </Accounts>
                         </AccountsResponse>
     
-    /{accountid}: 
+    /{accountId}: 
         
         description: Account ID Desc
         
@@ -1222,6 +1206,820 @@ securitySchemes:
                                         </Site>
                                         </Sites>
                                     </SitesResponse>
+            /{siteId}: 
+                description: NOTE *** This is a template file that acts as a termplate and placeholder for final documentation of a resource.  Modify this at will.
+                
+                get:
+                    description: |
+                        A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword 
+                    queryParameters:
+                        account:
+                            type: string
+                            required: true
+                            description: the account that the user is valid for
+                            default: 20
+                        direction:
+                            description: hardy har har
+                            type: string
+                            example: a_string
+                        inclination:
+                            description: another fing description
+                            type: integer
+                            example: 98764
+                            maximum: 99999
+                    responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                        200:
+                            description: An optional description of the response.
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <example>
+                                            example content is piped content that will be provided as an example
+                                            in this case of the Response
+                                        </example> 
+                        400:
+                            description: |
+                                The description can be used for discussing generic responses.
+                                Note that descriptions anywhere can be piped content. Lines will be concatenated together.
+                                *_Markup is allowed_*
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <example>
+                                            example content is piped content that will be provided as an example
+                                            in this case of the Response
+                                        </example> 
+                
+                post:
+                    description: Create a user
+                    body:
+                        application/xml:
+                            example: |
+                                <Users>
+                                    <User>
+                                        <Username>testcustomer</Username>
+                                        <Password>test123</Password>
+                                        <FirstName>Jane</FirstName>
+                                        <LastName>Doe</LastName>
+                                        <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                        <TelephoneNumber>9199999999</TelephoneNumber>
+                                    </User>
+                                </Users>
+                    responses:
+                        200:
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <UsersResponse>
+                                            <Users>
+                                                <User>
+                                                    <Username>admin</Username>
+                                                    <Roles>
+                                                        <Role>
+                                                            <RoleName>ROLE_ADMIN</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                                <Permission>
+                                                                    <PermissionName>UPDATE</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                        <Role>
+                                                            <RoleName>ROLE_BDR</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                    </Roles>
+                                                </User>
+                                            </Users>
+                                        </UsersResponse>
+                 
+                put:
+                    description: |
+                        A piped description that has 
+                        more than one line and some 
+                        * markup 
+                    responses:
+                        200:
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <UsersResponse>
+                                            <Users>
+                                                <User>
+                                                    <Username>admin</Username>
+                                                    <Roles>
+                                                        <Role>
+                                                            <RoleName>ROLE_ADMIN</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                                <Permission>
+                                                                    <PermissionName>UPDATE</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                        <Role>
+                                                            <RoleName>ROLE_BDR</RoleName>
+                                                            <Permissions>
+                                                                <Permission>
+                                                                    <PermissionName>VIEW</PermissionName>
+                                                                </Permission>
+                                                            </Permissions>
+                                                        </Role>
+                                                    </Roles>
+                                                </User>
+                                            </Users>
+                                        </UsersResponse>               
+                
+                # The resource tree that follows the root can be placed here.
+                # values in curly braces will appear as fillable parameters in the URL
+                # remember to fix these / delete these until the files are really there.
+                
+                /sippeers: 
+                    description: NOTE *** This is a template file that acts as a termplate and placeholder for final documentation of a resource.  Modify this at will.
+                    
+                    get:
+                        description: |
+                            A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword
+                        queryParameters:
+                            account:
+                                type: string
+                                required: true
+                                description: the account that the user is valid for
+                                default: 20
+                            direction:
+                                description: hardy har har
+                                type: string
+                                example: a_string
+                            inclination:
+                                description: another fing description
+                                type: integer
+                                example: 98764
+                                maximum: 99999
+                        responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                            200:
+                                description: An optional description of the response.
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <example>
+                                                example content is piped content that will be provided as an example
+                                                in this case of the Response
+                                            </example> 
+                            400:
+                                description: |
+                                    The description can be used for discussing generic responses.
+                                    Note that descriptions anywhere can be piped content. Lines will be concatenated together.
+                                    *_Markup is allowed_*
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <example>
+                                                example content is piped content that will be provided as an example
+                                                in this case of the Response
+                                            </example> 
+                    
+                    post:
+                        description: Create a user
+                        body:
+                            application/xml:
+                                example: |
+                                    <Users>
+                                        <User>
+                                            <Username>testcustomer</Username>
+                                            <Password>test123</Password>
+                                            <FirstName>Jane</FirstName>
+                                            <LastName>Doe</LastName>
+                                            <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                            <TelephoneNumber>9199999999</TelephoneNumber>
+                                        </User>
+                                    </Users>
+                        responses:
+                            200:
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <UsersResponse>
+                                                <Users>
+                                                    <User>
+                                                        <Username>admin</Username>
+                                                        <Roles>
+                                                            <Role>
+                                                                <RoleName>ROLE_ADMIN</RoleName>
+                                                                <Permissions>
+                                                                    <Permission>
+                                                                        <PermissionName>VIEW</PermissionName>
+                                                                    </Permission>
+                                                                    <Permission>
+                                                                        <PermissionName>UPDATE</PermissionName>
+                                                                    </Permission>
+                                                                </Permissions>
+                                                            </Role>
+                                                            <Role>
+                                                                <RoleName>ROLE_BDR</RoleName>
+                                                                <Permissions>
+                                                                    <Permission>
+                                                                        <PermissionName>VIEW</PermissionName>
+                                                                    </Permission>
+                                                                </Permissions>
+                                                            </Role>
+                                                        </Roles>
+                                                    </User>
+                                                </Users>
+                                            </UsersResponse>
+                     
+                    put:
+                        description: |
+                            A piped description that has 
+                            more than one line and some 
+                            * markup 
+                        responses:
+                            200:
+                                body: 
+                                    application/xml:
+                                        example: |
+                                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                            <UsersResponse>
+                                                <Users>
+                                                    <User>
+                                                        <Username>admin</Username>
+                                                        <Roles>
+                                                            <Role>
+                                                                <RoleName>ROLE_ADMIN</RoleName>
+                                                                <Permissions>
+                                                                    <Permission>
+                                                                        <PermissionName>VIEW</PermissionName>
+                                                                    </Permission>
+                                                                    <Permission>
+                                                                        <PermissionName>UPDATE</PermissionName>
+                                                                    </Permission>
+                                                                </Permissions>
+                                                            </Role>
+                                                            <Role>
+                                                                <RoleName>ROLE_BDR</RoleName>
+                                                                <Permissions>
+                                                                    <Permission>
+                                                                        <PermissionName>VIEW</PermissionName>
+                                                                    </Permission>
+                                                                </Permissions>
+                                                            </Role>
+                                                        </Roles>
+                                                    </User>
+                                                </Users>
+                                            </UsersResponse>               
+                    
+                    # The resource tree that follows the root can be placed here.
+                    # values in curly braces will appear as fillable parameters in the URL
+                    # remember to fix these / delete these until the files are really there.
+                    
+                    /{sippeerId}: 
+                        description: NOTE *** This is a template file that acts as a termplate and placeholder for final documentation of a resource.  Modify this at will.
+                        
+                        get:
+                            description: |
+                                A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword 
+                            queryParameters:
+                                account:
+                                    type: string
+                                    required: true
+                                    description: the account that the user is valid for
+                                    default: 20
+                                direction:
+                                    description: hardy har har
+                                    type: string
+                                    example: a_string
+                                inclination:
+                                    description: another fing description
+                                    type: integer
+                                    example: 98764
+                                    maximum: 99999
+                            responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                                200:
+                                    description: An optional description of the response.
+                                    body: 
+                                        application/xml:
+                                            example: |
+                                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                <example>
+                                                    example content is piped content that will be provided as an example
+                                                    in this case of the Response
+                                                </example> 
+                                400:
+                                    description: |
+                                        The description can be used for discussing generic responses.
+                                        Note that descriptions anywhere can be piped content. Lines will be concatenated together.
+                                        *_Markup is allowed_*
+                                    body: 
+                                        application/xml:
+                                            example: |
+                                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                <example>
+                                                    example content is piped content that will be provided as an example
+                                                    in this case of the Response
+                                                </example> 
+                        
+                        post:
+                            description: Create a user
+                            body:
+                                application/xml:
+                                    example: |
+                                        <Users>
+                                            <User>
+                                                <Username>testcustomer</Username>
+                                                <Password>test123</Password>
+                                                <FirstName>Jane</FirstName>
+                                                <LastName>Doe</LastName>
+                                                <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                                <TelephoneNumber>9199999999</TelephoneNumber>
+                                            </User>
+                                        </Users>
+                            responses:
+                                200:
+                                    body: 
+                                        application/xml:
+                                            example: |
+                                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                <UsersResponse>
+                                                    <Users>
+                                                        <User>
+                                                            <Username>admin</Username>
+                                                            <Roles>
+                                                                <Role>
+                                                                    <RoleName>ROLE_ADMIN</RoleName>
+                                                                    <Permissions>
+                                                                        <Permission>
+                                                                            <PermissionName>VIEW</PermissionName>
+                                                                        </Permission>
+                                                                        <Permission>
+                                                                            <PermissionName>UPDATE</PermissionName>
+                                                                        </Permission>
+                                                                    </Permissions>
+                                                                </Role>
+                                                                <Role>
+                                                                    <RoleName>ROLE_BDR</RoleName>
+                                                                    <Permissions>
+                                                                        <Permission>
+                                                                            <PermissionName>VIEW</PermissionName>
+                                                                        </Permission>
+                                                                    </Permissions>
+                                                                </Role>
+                                                            </Roles>
+                                                        </User>
+                                                    </Users>
+                                                </UsersResponse>
+                         
+                        put:
+                            description: |
+                                A piped description that has 
+                                more than one line and some 
+                                * markup 
+                            responses:
+                                200:
+                                    body: 
+                                        application/xml:
+                                            example: |
+                                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                <UsersResponse>
+                                                    <Users>
+                                                        <User>
+                                                            <Username>admin</Username>
+                                                            <Roles>
+                                                                <Role>
+                                                                    <RoleName>ROLE_ADMIN</RoleName>
+                                                                    <Permissions>
+                                                                        <Permission>
+                                                                            <PermissionName>VIEW</PermissionName>
+                                                                        </Permission>
+                                                                        <Permission>
+                                                                            <PermissionName>UPDATE</PermissionName>
+                                                                        </Permission>
+                                                                    </Permissions>
+                                                                </Role>
+                                                                <Role>
+                                                                    <RoleName>ROLE_BDR</RoleName>
+                                                                    <Permissions>
+                                                                        <Permission>
+                                                                            <PermissionName>VIEW</PermissionName>
+                                                                        </Permission>
+                                                                    </Permissions>
+                                                                </Role>
+                                                            </Roles>
+                                                        </User>
+                                                    </Users>
+                                                </UsersResponse>               
+                        
+                        # The resource tree that follows the root can be placed here.
+                        # values in curly braces will appear as fillable parameters in the URL
+                        # remember to fix these / delete these until the files are really there.
+                        
+                        /tns: 
+                            description: NOTE *** This is a template file that acts as a termplate and placeholder for final documentation of a resource.  Modify this at will.
+                            
+                            get:
+                                description: |
+                                    A sample description.  Long descriptions can be piped, and short ones can go on the line with the keyword 
+                                queryParameters:
+                                    account:
+                                        type: string
+                                        required: true
+                                        description: the account that the user is valid for
+                                        default: 20
+                                    direction:
+                                        description: hardy har har
+                                        type: string
+                                        example: a_string
+                                    inclination:
+                                        description: another fing description
+                                        type: integer
+                                        example: 98764
+                                        maximum: 99999
+                                responses:    # note that the responses cannot be generic.  4xx is unfortunately not a valid response tag
+                                    200:
+                                        description: An optional description of the response.
+                                        body: 
+                                            application/xml:
+                                                example: |
+                                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                    <example>
+                                                        example content is piped content that will be provided as an example
+                                                        in this case of the Response
+                                                    </example> 
+                                    400:
+                                        description: |
+                                            The description can be used for discussing generic responses.
+                                            Note that descriptions anywhere can be piped content. Lines will be concatenated together.
+                                            *_Markup is allowed_*
+                                        body: 
+                                            application/xml:
+                                                example: |
+                                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                    <example>
+                                                        example content is piped content that will be provided as an example
+                                                        in this case of the Response
+                                                    </example> 
+                            
+                            post:
+                                description: Create a user
+                                body:
+                                    application/xml:
+                                        example: |
+                                            <Users>
+                                                <User>
+                                                    <Username>testcustomer</Username>
+                                                    <Password>test123</Password>
+                                                    <FirstName>Jane</FirstName>
+                                                    <LastName>Doe</LastName>
+                                                    <EmailAddress>janedoe@bandwidth.com</EmailAddress>
+                                                    <TelephoneNumber>9199999999</TelephoneNumber>
+                                                </User>
+                                            </Users>
+                                responses:
+                                    200:
+                                        body: 
+                                            application/xml:
+                                                example: |
+                                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                    <UsersResponse>
+                                                        <Users>
+                                                            <User>
+                                                                <Username>admin</Username>
+                                                                <Roles>
+                                                                    <Role>
+                                                                        <RoleName>ROLE_ADMIN</RoleName>
+                                                                        <Permissions>
+                                                                            <Permission>
+                                                                                <PermissionName>VIEW</PermissionName>
+                                                                            </Permission>
+                                                                            <Permission>
+                                                                                <PermissionName>UPDATE</PermissionName>
+                                                                            </Permission>
+                                                                        </Permissions>
+                                                                    </Role>
+                                                                    <Role>
+                                                                        <RoleName>ROLE_BDR</RoleName>
+                                                                        <Permissions>
+                                                                            <Permission>
+                                                                                <PermissionName>VIEW</PermissionName>
+                                                                            </Permission>
+                                                                        </Permissions>
+                                                                    </Role>
+                                                                </Roles>
+                                                            </User>
+                                                        </Users>
+                                                    </UsersResponse>
+                             
+                            put:
+                                description: |
+                                    A piped description that has 
+                                    more than one line and some 
+                                    * markup 
+                                responses:
+                                    200:
+                                        body: 
+                                            application/xml:
+                                                example: |
+                                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                    <UsersResponse>
+                                                        <Users>
+                                                            <User>
+                                                                <Username>admin</Username>
+                                                                <Roles>
+                                                                    <Role>
+                                                                        <RoleName>ROLE_ADMIN</RoleName>
+                                                                        <Permissions>
+                                                                            <Permission>
+                                                                                <PermissionName>VIEW</PermissionName>
+                                                                            </Permission>
+                                                                            <Permission>
+                                                                                <PermissionName>UPDATE</PermissionName>
+                                                                            </Permission>
+                                                                        </Permissions>
+                                                                    </Role>
+                                                                    <Role>
+                                                                        <RoleName>ROLE_BDR</RoleName>
+                                                                        <Permissions>
+                                                                            <Permission>
+                                                                                <PermissionName>VIEW</PermissionName>
+                                                                            </Permission>
+                                                                        </Permissions>
+                                                                    </Role>
+                                                                </Roles>
+                                                            </User>
+                                                        </Users>
+                                                    </UsersResponse>               
+                            
+                            # The resource tree that follows the root can be placed here.
+                            # values in curly braces will appear as fillable parameters in the URL
+                            # remember to fix these / delete these until the files are really there.
+                            
+                            /{tn}: 
+                                get:
+                                    description: |
+                                        Link for receiving information about telephone number. CallForward - Does this telephone number have call forwarding or not,
+                                        CallingNameDisplay - Calling Name of the caller is available to the user or not on incoming calls.
+                                    responses:
+                                        200:
+                                            description: |
+                                                CallForward and  CallingNameDisplay is not required in the response
+                                            body: 
+                                                application/xml:
+                                                    example: |
+                                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                        <SipPeerTelephoneNumberResponse>
+                                                            <SipPeerTelephoneNumber>
+                                                                <FullNumber>5209072451</FullNumber>
+                                                                <CallForward>7042661720</CallForward>
+                                                                <CallingNameDisplay>true</CallingNameDisplay>
+                                                            </SipPeerTelephoneNumber>
+                                                        </SipPeerTelephoneNumberResponse>
+                                put:
+                                    description: | 
+                                        This API can be used by the Bandwidth Dashboard or general API users to update the settings for TNs allocated to their account.
+                                    body:
+                                        application/xml:
+                                            example: | 
+                                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                                <SipPeerTelephoneNumber>
+                                                    <FullNumber>2053778344</FullNumber>
+                                                    <CallForward>7042661720</CallForward>
+                                                    <CallingNameDisplay>true</CallingNameDisplay>
+                                                    <ResponseStatus></ResponseStatus>
+                                                </SipPeerTelephoneNumber>
+                                    responses:
+                                        200:
+                                            description: |
+                                                There is no body response when request is successful
+                                        400:
+                                            description: |
+                                                There are some possible Bad requests. If account doesn't have a CallForward or CNAM product feature.
+                                            body:
+                                                application/xml:
+                                                    example: |
+                                                        <SipPeerTelephoneNumberResponse>
+                                                            <ResponseStatus>
+                                                                <ErrorCode>13576</ErrorCode>
+                                                                <Description>Account '9999999' has no 'CallForwarding' product feature</Description>
+                                                            </ResponseStatus>
+                                                        </SipPeerTelephoneNumberResponse>
+                                
+                                
+                                # The resource tree that follows the root can be placed here.
+                                # values in curly braces will appear as fillable parameters in the URL
+                                # remember to fix these / delete these until the files are really there.
+
+
+
+
+
+
+        /orders: 
+            
+            description:   |
+                The *+orders+* resource is used to acquire additional telephone numbers for the account that owns the resource.
+            
+                There are a number of independent kinds of new number order, intended to search for and obtain numbers using different search criteria.  Some of the applicable search criteria are:
+                - NPA / Area Code
+                - NPA-NXX combination
+                - State
+                - Rate Center and State, with or without a Local Calling Center constraint
+                - City and State
+                - ZIP Code
+                - LATA
+            
+                An attempt to order numbers will create an order record that is maintained by the Bandwidth Dashboard to provide a record of the attempt to order the Telephone Numbers, and provide feedback on the success or failure of that attempt.
+                The order record is identified by an order-id that can be used to uniquely identify the order attempt, and to contain a record of the request and the result.
+            
+            get: 
+                description: |
+                    GET is used to retrieve order ids and order details for New Number orders that were created by previous attempts to order numbers.
+            
+                queryParameters: 
+                    customerOrderId: 
+                        type: string
+                        description: The order ID that the Customer / Account assigned to the Order
+                        example: ORD12345
+                    userid:
+                        description: The userid of the user that submitted the new number order
+                        type: string
+                        example: user@customer.com
+                    startdate:
+                        description: The last day of the search date range for a date-range-limited search of net number orders.  The format is YY-MM-DD.
+                        type: date
+                        example: 13-12-15
+                    enddate:
+                        description: The last day of the search date range for a date-range-limited search of net number orders.  The format is YY-MM-DD.
+                        type: date
+                        example: 13-12-31
+                    page:
+                        description: All Order retrievals must be paginated, using page and size indicators.  The page parameter contains the order-id that is to start the page, or "1" in the case of the first page.
+                        type: string
+                        example: cbdcfc94-81b1-4ce9-8b6d-f8d6b85381ba
+                        required: true
+                    size:
+                        description: The size parameter indicates the number of orders to return in the payload
+                        type: integer
+                        example: 20
+                        required: true
+                responses:    
+                    200:
+                        description: The Order retrieval request will return a list of the orders that match the criteria imposed by the query parameters that are provided.  The orders list contains a detailed description of much of the information associated with the order.  Notice that the first elements of the payload provide link information that can be used to page through a paginated list of orders.  Pagination can be controlled by use of the size and page query parameters.
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0"?>
+                                    <ResponseSelectWrapper>
+                                        <ListOrderIdUserIdDate>
+                                            <TotalCount>122</TotalCount>
+                                            <Links>
+                                            <first>
+                                                Link=<https //api.inetwork.com 443/v1.0/accounts/9900012/orders?page=1&size=3>;rel="first";
+                                            </first>
+                                            <next>
+                                                Link=<https //api.inetwork.com 443/v1.0/accounts/9900012/orders?page=cbdcfc94-81b1-4ce9-8b6d-f8d6b85381ba&size=3>;rel="next";
+                                            </next>
+                                            </Links>
+                                            <OrderIdUserIdDate>
+                                                <CountOfTNs>1</CountOfTNs>
+                                                <lastModifiedDate>2013-12-20T06</lastModifiedDate>
+                                                <OrderDate>2013-12-20T06</OrderDate>
+                                                <orderId>c5d8d076-345c-45d7-87b3-803a35cca89b</orderId>
+                                                <OrderStatus>COMPLETE</OrderStatus>
+                                                <TelephoneNumberDetails>
+                                                    <States>
+                                                        <StateWithCount>
+                                                            <State>VA</State>
+                                                            <Count>1</Count>
+                                                        </StateWithCount>
+                                                    </States>
+                                                    <RateCenters>
+                                                        <RateCenterWithCount>
+                                                            <Count>1</Count>
+                                                            <RateCenter>LADYSMITH</RateCenter>
+                                                        </RateCenterWithCount>
+                                                    </RateCenters>
+                                                    <Cities>
+                                                        <CityWithCount>
+                                                            <City>LADYSMITH</City>
+                                                            <Count>1</Count>
+                                                        </CityWithCount>
+                                                    </Cities>
+                                                    <Tiers>
+                                                        <TierWithCount>
+                                                            <Tier>0</Tier>
+                                                            <Count>1</Count>
+                                                        </TierWithCount>
+                                                    </Tiers>
+                                                    <Vendors>
+                                                        <VendorWithCount>
+                                                            <VendorId>49</VendorId>
+                                                            <VendorName>Bandwidth CLEC</VendorName>
+                                                            <Count>1</Count>
+                                                        </VendorWithCount>
+                                                    </Vendors>
+                                                </TelephoneNumberDetails>
+                                                <userId>bwc_user</userId>
+                                            </OrderIdUserIdDate>
+                                            <OrderIdUserIdDate>
+                                                <CountOfTNs>0</CountOfTNs>
+                                                <lastModifiedDate>2013-11-05T17</lastModifiedDate>
+                                                <OrderDate>2013-11-05T17</OrderDate>
+                                                <orderId>27da9f39-81f3-44ed-80ce-05ddf2db612d</orderId>
+                                                <OrderStatus>FAILED</OrderStatus>
+                                                <userId>wandedemo_user</userId>
+                                            </OrderIdUserIdDate>
+                                            <OrderIdUserIdDate>
+                                                <CountOfTNs>1</CountOfTNs>
+                                                <lastModifiedDate>2013-12-11T20</lastModifiedDate>
+                                                <OrderDate>2013-12-11T20</OrderDate>
+                                                <orderId>2bab589e-2cda-453b-9999-8f35441d4a1a</orderId>
+                                                <OrderStatus>COMPLETE</OrderStatus>
+                                                <TelephoneNumberDetails>
+                                                    <States>
+                                                        <StateWithCount>
+                                                            <State>VA</State>
+                                                            <Count>1</Count>
+                                                        </StateWithCount>
+                                                    </States>
+                                                    <RateCenters>
+                                                        <RateCenterWithCount>
+                                                            <Count>1</Count>
+                                                            <RateCenter>LADYSMITH</RateCenter>
+                                                        </RateCenterWithCount>
+                                                    </RateCenters>
+                                                    <Cities>
+                                                        <CityWithCount>
+                                                            <City>LADYSMITH</City>
+                                                            <Count>1</Count>
+                                                        </CityWithCount>
+                                                    </Cities>
+                                                    <Tiers>
+                                                        <TierWithCount>
+                                                            <Tier>0</Tier>
+                                                            <Count>1</Count>
+                                                        </TierWithCount>
+                                                    </Tiers>
+                                                    <Vendors>
+                                                        <VendorWithCount>
+                                                            <VendorId>49</VendorId>
+                                                            <VendorName>Bandwidth CLEC</VendorName>
+                                                            <Count>1</Count>
+                                                        </VendorWithCount>
+                                                    </Vendors>
+                                                </TelephoneNumberDetails>
+                                                <userId>bwc_user</userId>
+                                            </OrderIdUserIdDate>
+                                        </ListOrderIdUserIdDate>
+                                    </ResponseSelectWrapper>
+                    400: 
+                        description: malformed Query Parameters can result in a 400 Bad request.  In this case the URL is malformed in some way.
+                    404: 
+                        description: returned if the retrieval request cannot be satisfied, either because of exclusion created by search parameters, or other faults.  No content is returned in the event of a 404 return code.
+            post:
+                description: |
+                    A POST on the /orders resource is used to request that the system provide one or more TNs for use by the account.  The post creates a new number order record to preserve the request and the response of the Bandwidth Dashboard to the request.  A well-formed POST on the /orders resource will uniformly create an order record, and return an order-id string that can be used to uniquely identify the new number order request.  The details of success and failure of the request for TNs will be preserved and linked to the returned order id.
+                    The order-id is returned in the Location Header, allowing the API user immediate access to the order.
+            
+                    Common values in the request payload include...
+                    * Quantity - the number of TNs that are 
+                body: 
+                    application/xml: 
+                        example: |
+                            The *Area Code search type* provides the desired Area Code used to drive the search
+                            <?xml version="1.0"?>
+                            <Order>
+                                <Name>Area Code Order</Name>
+                                <SiteId>385</SiteId>
+                                <CustomerOrderId>123456789</CustomerOrderId>
+                                <AreaCodeSearchAndOrderType>
+                                    <AreaCode>617</AreaCode>
+                                    <Quantity>1</Quantity>
+                                </AreaCodeSearchAndOrderType>
+                            </Order>
+                responses:
+                    200:
+                        body: 
+                            application/xml:
+                                example: |
+                                    More to follow.
+                          
+            
+            # The resource tree that follows the root can be placed here.
+            # values in curly braces will appear as fillable parameters in the URL
+            # remember to fix these / delete these until the files are really there.
 
         /inserviceNumbers: 
             description: |
@@ -1606,8 +2404,8 @@ securitySchemes:
             status:
                 description: The status of the portin order being searched for.
                 type: string
-                example: EXCEPTION
-                enum: [SUBMITTED, EXCEPTION, FOC, CANCELLED, COMPLETE]
+                example: BACKORDERED
+                enum: [PARTIAL, FAILED, BACKORDERED, COMPLETE]
                 repeat: true
             telephoneNumber:
                 description: A Telephone Number (TN) that is referenced in the order - a TN ported by the Port Order
@@ -1634,17 +2432,38 @@ securitySchemes:
                 type: string
                 enum: [quiet, responded, changed, seen]
                 example: responded
+                repeat: true
             bandwidthPrime:
                 description: The name of the Bandwidth person responsible for managing the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API.
                 example: GeorgeB
-            modifiedFromDate:
-                description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
                 type: string
-                example: 13-10-22
-            modifiedToDate:
-                description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
+                repeat: true
+            modifiedDateFrom:
+                description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form yyyy-MM-dd.
                 type: string
-                example: 13-10-25
+                example: 2013-10-22
+            modifiedDateTo:
+                description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form yyyy-MM-dd.
+                type: string
+                example: 2013-10-25
+            createdDateFrom: 
+                description: Checks the order's creation date against this value. Orders that have a creation date after this date will be included. Format is yyyy-MM-dd 
+                type: string
+                example: 2013-10-22
+            createdDateTo:
+                description: Checks the order's creation date against this value. Orders that have a creation date before this date will be included. Format is yyyy-MM-dd 
+                type: string
+                example: 2013-10-25
+            lastModifiedAfter:
+                description: Checks the order's last modified date against this value. Orders that have a modification date after this date will be included. Format is yyyy-MM-dd 
+                type: string
+                example: 2013-10-25
+            includeInResponse:
+                description: Includes optional values into the response according to the provided value. Multiple values can be provided.
+                type: string
+                enum: [LAST_NOTE, SUPP_COUNT, ADMIN_INFO]
+                repeat: true
+                example: includeInResponse=LAST_NOTE&amp;includeInResponse=ADMIN_INFO
         responses:    
             200:
                 description: |
@@ -1768,15 +2587,17 @@ securitySchemes:
                 type: string
                 enum: [quiet, responded, changed, seen]
                 example: responded
+                repeat: true
             bandwidthPrime:
                 description: The name of the Bandwidth person responsible for managing the Port-in Order - used to manage orders within Bandwidth.  This parameter may not be exposed in the external representation of the API.
                 type: string
                 example: GeorgeB
-            lastModifiedFromDate:
+                repeat: true
+            modifiedFromDate:
                 description: For Date-based searches, the starting date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
                 type: string
                 example: 13-10-22
-            lastModifiedToDate:
+            modifiedToDate:
                 description: For Date-based searches, the ending date of a date range that will be used to find Port-in Orders that were modified within the date range.  It is in the form YY-MM-DD.
                 type: string
                 example: 13-10-25
@@ -1865,7 +2686,7 @@ securitySchemes:
     
     get:
         description: |
-            Retrieve information about one or more Port-in Orders (portins), where the orders are chosen based on the search parameters provided in the API Call. 
+            Retrieve information about one or more Port-Out Orders (portins), where the orders are chosen based on the search parameters provided in the API Call. 
             Not all search parameters are compatible with all other search parameters, due to the complexity of searching for historical records using highly parameterized or complex searches.  As a result:
             * all query parameters are compatible with the exception of...
             ** if modifiedFromDate or modifiedToDate are specified, then the only other valid search parameters are accountId, sippeerId or siteId
@@ -2133,22 +2954,22 @@ securitySchemes:
                 displayName: available 
                 type: boolean
                 description: |
-                    true if the desired outcome is to filter the result and only show *available* cities.  
+                    true if the desired outcome is to filter the result and only show *available* Rate Centers.  
                     If available is chosen then the result also includes an indication of the number of 
-                    available numbers in that city
+                    available numbers in that Rate Center.
                 example: true
                 required: false
             supported:
                 displayName: supported 
                 type: boolean
                 description: |
-                    true if the desired outcome is to show cities that Bandwidth can serve.  
+                    true if the desired outcome is to show Rate Centers that Bandwidth can serve.  
                 example: true
                 required: false
         responses:
             200:
                 description: | 
-                    This response returns the list of cities, along with the Rate Centers that serve those Cities.  If +available+ is specified then the number of TNs available in that city / RC combination is also included.
+                    This response returns the list of Rate Centers, along with the Rate Centers that serve those Rate Centers.  If +available+ is specified then the number of TNs available in that Rate Center is also included.
                 body: 
                     application/xml:
                         example: |
@@ -2454,6 +3275,63 @@ securitySchemes:
                     description: No Content - there are no numbers found using the search parameters
                 404:
                     description: Not Found - The search parameters are invalid and prevent finding any content   
+        
+        post:
+            description: |
+                A POST to the available orders API will add the listed TNs to the overall inventory, and create a work-order that can be used to track the status of that attempt.
+        
+                Key data elements in the payload include...
+                * The account and gateway profile, that control the routing of calls that are placed to these numbers.  The typical values are *UnallocatedNonTF* and *UnallocatedTF*.
+                * The Vendor name that will be associated with these numbers.  There must be allignment with the NPANXX of the numbers that are being imported, and the Vendor that supplies the rate center in which the numbers will land.
+                * The list of telephone numbers themselves.
+            body: 
+                application/xml:
+                    example: |
+                        <?xml version="1.0"?>
+                        <ImportAvailableNumberOrder>
+                            <ImportAvailableNumberOrderType>
+                                <AccountProfile>UnallocatedNonTF</AccountProfile>
+                                <GatewayProfile>UnallocatedNonTF</GatewayProfile>
+                                <TelephoneNumberList>
+                                    <TelephoneNumber>9702122349</TelephoneNumber>
+                                    <TelephoneNumber>9702122350</TelephoneNumber>
+                                    <TelephoneNumber>9702122351</TelephoneNumber>
+                                    <TelephoneNumber>9702122352</TelephoneNumber>
+                                </TelephoneNumberList>
+                                <VendorName>Bandwidth.com powered by Level 3</VendorName>
+                            </ImportAvailableNumberOrderType>
+                        </ImportAvailableNumberOrder>
+            responses:
+                201:
+                    description: | 
+                        Created.
+                        This response describes the creation of the import to available work-order that describes the attempt to import numbers into the Bandwidth Dashboard available inventory.  The response includes an XML payload that describes the order, and also includes a Location header value that will access the created order resource.
+        
+                        Payload items include...
+                        * the ID of the work order that was created
+                        * the details provided in the POST that created the order.
+                    body:
+                        application/xml:
+                            example: |
+                                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <ImportAvailableNumberOrderResponse>
+                                        <orderRequest>
+                                            <id>6b811ff6-3e48-4513-a3b3-8f41cce1bfd5</id>
+                                            <ImportAvailableNumberOrderType>
+                                                <AccountProfile>UnallocatedNonTF</AccountProfile>
+                                                <GatewayProfile>UnallocatedNonTF</GatewayProfile>
+                                                <TelephoneNumberList>
+                                                    <TelephoneNumber>9702122349</TelephoneNumber>
+                                                    <TelephoneNumber>9702122350</TelephoneNumber>
+                                                    <TelephoneNumber>9702122351</TelephoneNumber>
+                                                    <TelephoneNumber>9702122352</TelephoneNumber>
+                                                </TelephoneNumberList>
+                                                <VendorName>Bandwidth.com powered by Level 3</VendorName>
+                                            </ImportAvailableNumberOrderType>
+                                        </orderRequest>
+                                    </ImportAvailableNumberOrderResponse>
+        
+        
         
         /{orderid}: 
             description: |
