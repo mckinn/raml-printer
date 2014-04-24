@@ -14,7 +14,7 @@ public class RAMLResponsesValues extends RAMLToken {
     String responseCode;    // the [0-9][0-9][0-9]:
     String responseDescription;
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;
+    RAMLTokenList subtendingThings;
     int numberOfThings;
 
     public RAMLResponsesValues(int indentSpaces, String rc) {
@@ -22,7 +22,7 @@ public class RAMLResponsesValues extends RAMLToken {
         this.responseCode = rc;
         this.responseDescription = null;
         this.numberOfThings = 0;
-        this.subtendingThings = new ArrayList<RAMLToken>();
+        this.subtendingThings = new RAMLTokenList();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class RAMLResponsesValues extends RAMLToken {
 
             // extract the proposed token.  this token should be the first token on the current row,
             // either description or application/xml.
-            // todo - use importantInformation.getFirstToken in the switch, and discard "token" instead.
+            // done - use importantInformation.getFirstToken in the switch, and discard "token" instead.
             // Scanner s = new Scanner(currentLine);
             // token = s.next();
 
@@ -86,13 +86,33 @@ public class RAMLResponsesValues extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML(Boolean removeTokenName) {
+        // return this.stringMe();
+        // always output the response code
+        RAMLToken rat;
+
+        String outcome = "\n<span class = \"" + markupType.responsesvalues.CSSClass() + "\">\n";
+        outcome += this.responseCode + "\n</span>\n<div>";
+
+        if ((rat = subtendingThings.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        for (RAMLToken rt: subtendingThings){
+            if (rt.getMarkupType() == markupType.body) {
+                outcome += rt.formatRAMLasHTML(true);
+            }
+        }
+        outcome += "\n</div>\n";
+        return outcome;
     }
 
     @Override
     void spewRAMLFile(String toSave) {
 
+    }
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.responsesvalues;
     }
 
     @Override

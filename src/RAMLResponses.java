@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 /**
  * Created by smckinnon on 3/22/14.
@@ -8,12 +7,12 @@ import java.util.StringTokenizer;
 public class RAMLResponses extends RAMLToken {
 
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;  // all will be Responses Values or Descriptions
+    RAMLTokenList subtendingThings;  // all will be Responses Values or Descriptions
     int numberOfThings;
 
     public RAMLResponses(int indentSpaces) {
         this.indentSpaces = indentSpaces;
-        this.subtendingThings = new ArrayList<RAMLToken>();
+        this.subtendingThings = new RAMLTokenList();
         this.numberOfThings = 0;
     }
 
@@ -76,9 +75,31 @@ public class RAMLResponses extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    markupType getMarkupType() {
+        return markupType.responses;
     }
+
+    @Override
+    String formatRAMLasHTML(Boolean removeTokenName) {
+        // return this.stringMe();
+        // never output the "responses:"
+
+        RAMLToken rat;
+
+        String outcome = "\n<div><!-- in responses -->\n" +
+                "<h4 class = \"" + markupType.responses.CSSClass() + "\"> Response Codes and Content </h4>";
+
+        if ((rat = subtendingThings.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        for (RAMLToken rt: subtendingThings){
+            if (rt.getMarkupType() == markupType.responsesvalues) {
+                outcome += rt.formatRAMLasHTML(false);
+            }
+        }
+        outcome += "\n</div>\n";
+        return outcome;
+    }
+
 
     @Override
     void spewRAMLFile(String toSave) {

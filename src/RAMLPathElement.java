@@ -10,14 +10,20 @@ public class RAMLPathElement extends RAMLToken {
 
     String pathElement;
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;  // all will be Responses Values or Descriptions
+    RAMLTokenList subtendingThings;  // all will be Responses Values or Descriptions
     int numberOfThings;
+    String precursorPath;
 
     public RAMLPathElement(String pathElement, int indentSpaces) {
-        this.pathElement = pathElement;
+        this.pathElement = pathElement.substring(0,pathElement.indexOf(":"));  // get rid of the ":"
         this.indentSpaces = indentSpaces;
-        this.subtendingThings = new ArrayList<RAMLToken>();
+        this.subtendingThings = new RAMLTokenList();
         this.numberOfThings = 0;
+        this.precursorPath = "";
+    }
+
+    public void setPrecursorPath(String precursorPath) {
+        this.precursorPath = precursorPath;
     }
 
     @Override
@@ -89,13 +95,64 @@ public class RAMLPathElement extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML(Boolean removeTokenName) {
+
+        // ignore removeTokenName = always display the path element
+
+        RAMLToken rat;
+
+        String outcome = "\n<div><!-- in path -->\n" +
+                "<h1 class = \"" + markupType.pathElement.CSSClass() + "\"> " + this.precursorPath + this.pathElement + " </h1>";
+
+        if ((rat = subtendingThings.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(false);
+
+        for (RAMLToken rt: subtendingThings){  // get first if present, then POST, PUT, and DELETE
+            if (rt.getMarkupType() == markupType.httpMethod) {
+                if ( ((RAMLHTTPMethod) rt).getMethodName().equals("get:")) {
+                    outcome += rt.formatRAMLasHTML(false);
+                }
+            }
+        }
+        for (RAMLToken rt: subtendingThings){  // get first if present, then POST, PUT, and DELETE
+            if (rt.getMarkupType() == markupType.httpMethod) {
+                if ( ((RAMLHTTPMethod) rt).getMethodName().equals("post:")) {
+                    outcome += rt.formatRAMLasHTML(false);
+                }
+            }
+        }
+        for (RAMLToken rt: subtendingThings){  // get first if present, then POST, PUT, and DELETE
+            if (rt.getMarkupType() == markupType.httpMethod) {
+                if ( ((RAMLHTTPMethod) rt).getMethodName().equals("put:")) {
+                    outcome += rt.formatRAMLasHTML(false);
+                }
+            }
+        }
+        for (RAMLToken rt: subtendingThings){  // get first if present, then POST, PUT, and DELETE
+            if (rt.getMarkupType() == markupType.httpMethod) {
+                if ( ((RAMLHTTPMethod) rt).getMethodName().equals("delete:")) {
+                    outcome += rt.formatRAMLasHTML(false);
+                }
+            }
+        }
+
+        for (RAMLToken rt: subtendingThings){
+            if (rt.getMarkupType() == markupType.pathElement) {
+                ((RAMLPathElement) rt).setPrecursorPath(this.precursorPath + this.pathElement);
+                outcome += rt.formatRAMLasHTML(false);
+            }
+        }
+        outcome += "\n</div>\n";
+        return outcome;
     }
 
     @Override
     void spewRAMLFile(String toSave) {
 
+    }
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.pathElement;
     }
 
     @Override

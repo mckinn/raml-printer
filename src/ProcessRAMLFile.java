@@ -13,20 +13,20 @@ public class ProcessRAMLFile {
         // for each of the lines
         // find  a RAML object type:
         //
-        ArrayList<RAMLToken> documentComponents = new ArrayList<RAMLToken>();
+        RAMLTokenList documentComponents = new RAMLTokenList();
 
         Boolean successful;
         String token;
         RAMLToken ramlEntity;
-        int indentSpaces ;
+        markupType mut;
 
-        Scanner example = null;
-        try {
+        Scanner example = getInputStream();
+/*        try {
             example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\iris.min.raml"));
             //example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
 
         int arrayPosition = 0;
         assert example != null;
@@ -38,10 +38,9 @@ public class ProcessRAMLFile {
             ramlEntity = null;
 
             lineOfRamlText importantInformation = new lineOfRamlText(followingLine);
-            indentSpaces = importantInformation.getLeadingSpaces();
             token = importantInformation.getFirstToken();
 
-            switch(markupType.stringToMarkuptype(token)){
+            switch(mut=markupType.stringToMarkuptype(token)){
                 case description:
 //                    System.out.println("description***");
                     ramlEntity = new RAMLMultiLine(markupType.description, importantInformation.getLeadingSpaces());
@@ -72,9 +71,11 @@ public class ProcessRAMLFile {
                     }
                     break;
 
-                case otcoThorpe:
-//                    System.out.println("comment***");
-                    ramlEntity = new RAMLComment();
+                case title:
+                case baseUri:
+                case version:
+                case securedBy:
+                    ramlEntity = new RAMLSingleLine(mut);
                     followingLine = ramlEntity.vaccuumRAMLFIle(example, followingLine);
                     successful = true;
                     break;
@@ -98,11 +99,44 @@ public class ProcessRAMLFile {
         PrintStream out = getOutputPrintStream();
         String outcome;
 
-        for (RAMLToken rt: documentComponents){
+/*        for (RAMLToken rt: documentComponents){
             outcome = rt.stringMe();
-            // System.out.println(outcome);
             out.println(outcome);
+        }*/
+
+        RAMLToken rat;
+        outcome =  "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" +
+                   "<html>\n" +
+                   "<head>\n" +
+                   "<link rel=\"stylesheet\" type=\"text/css\" href=\"RAMLStyle.css\">" +
+                   "<title>";
+        if ((rat = documentComponents.findMarkupType(markupType.title)) != null) outcome += rat.toString();
+        outcome += "</title>" +
+                   "</head>\n" +
+                   "<body>\n";
+
+        if ((rat = documentComponents.findMarkupType(markupType.title)) != null) outcome += rat.formatRAMLasHTML(true);
+        if ((rat = documentComponents.findMarkupType(markupType.version)) != null) outcome += rat.formatRAMLasHTML(false);
+        if ((rat = documentComponents.findMarkupType(markupType.baseUri)) != null) outcome += rat.formatRAMLasHTML(false);
+        if ((rat = documentComponents.findMarkupType(markupType.securedBy)) != null) outcome += rat.formatRAMLasHTML(false);
+        if ((rat = documentComponents.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(false);
+
+        out.println(outcome);
+        outcome = "";
+
+        for (RAMLToken rt: documentComponents){
+            if (rt.getMarkupType() == markupType.pathElement) {
+                outcome = "<hr>";
+                outcome += rt.formatRAMLasHTML(false);
+                out.println(outcome);
+                outcome = "";
+            }
+
+
         }
+
+        outcome = "</body>\n</html>";
+        out.println(outcome);
 
     }
 
@@ -128,6 +162,34 @@ public class ProcessRAMLFile {
             } catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());
                 System.exit(1);
+            }
+        } while (out == null);
+        return out;
+    }
+
+    public static Scanner getInputStream() {
+
+        Scanner console = new Scanner(System.in);
+        System.out.print("Enter input file path and name: ");
+        Scanner out = null;
+
+        do {
+            String outputName = console.next();
+            try {
+                out = new Scanner(new File(outputName));
+                //example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
+            } catch (FileNotFoundException e) {
+                out = null;
+            }
+            // out has a valid value, or null
+            if (out == null) {
+                System.out.print("can't find it - did you want to try again ? ");
+                String response = console.next();
+                if (!response.equalsIgnoreCase("y")) {
+                    System.exit(1);
+                } else {
+                    System.out.print("try again: ");
+                }
             }
         } while (out == null);
         return out;

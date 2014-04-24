@@ -15,7 +15,7 @@ public class RAMLQueryParameterToken extends RAMLToken {
 
     String qpParmName;    // the [a-z]*:
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;
+    RAMLTokenList subtendingThings;
     int numberOfThings;
 
     // Because we do no know whether the parameter token can be created without
@@ -28,14 +28,14 @@ public class RAMLQueryParameterToken extends RAMLToken {
         this.qpParmName = null;
         this.indentSpaces = 0;
         this.numberOfThings = 0;
-        this.subtendingThings = new ArrayList<RAMLToken>();
+        this.subtendingThings = new RAMLTokenList();
     }
 
     public RAMLQueryParameterToken(String qpParmName, int indentSpaces) {
         this.qpParmName = checkQueryParameterNamePattern(qpParmName);  // null if the pattern did not match, or the pattern itself
         this.indentSpaces = indentSpaces;
         this.numberOfThings = 0;
-        this.subtendingThings = new ArrayList<RAMLToken>();
+        this.subtendingThings = new RAMLTokenList();
     }
 
     public void setIndentSpaces(int indentSpaces) {
@@ -75,17 +75,12 @@ public class RAMLQueryParameterToken extends RAMLToken {
 
             switch (mut = markupType.stringToMarkuptype(importantInformation.getFirstToken())) {
                 case description:
-//                    System.out.println("description in qpParms");
+/*                  System.out.println("description in qpParms");
                     ramlEntity = new RAMLMultiLine(mut, importantInformation.getLeadingSpaces());
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
-                    break;
+                    break;*/
                 case example:
-//                    System.out.println("example in qpParms");
-                    ramlEntity = new RAMLMultiLine(mut, importantInformation.getLeadingSpaces());
-                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
-                    successful = true;
-                    break;
                 case qpType:
                 case qpMaximim:
                 case qpMinimum:
@@ -94,8 +89,8 @@ public class RAMLQueryParameterToken extends RAMLToken {
                 case qpDefault:
                 case qpEnum:
                 case displayName:
-//                    System.out.println("In qparms with: " + this.getQpParmName() + " : " + markupType.markupTypeToString(mut));
-                    ramlEntity = new RAMLSingleLine(mut);
+                    //  All potential subtending types are going to be treated as a RAMLQPTokenValue.
+                    ramlEntity = new RAMLQPTokenValue(mut, importantInformation.getLeadingSpaces());
                     currentLine = ramlEntity.vaccuumRAMLFIle(example, currentLine);
                     successful = true;
                     break;
@@ -120,8 +115,31 @@ public class RAMLQueryParameterToken extends RAMLToken {
 
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML(Boolean removeTokenName) {
+
+        String outcome = "\n<span class = \"" + markupType.queryParameterNames.CSSClass() + "\">\n"
+                         + this.qpParmName + "\n</span><!-- in QueryParameterToken -->\n<div><ul>";
+
+        for (RAMLToken rt: subtendingThings){
+            switch(rt.getMarkupType()) {
+                case qpType:
+                case qpMaximim:
+                case qpMinimum:
+                case qpRequired:
+                case qpRepeat:
+                case qpDefault:
+                case qpEnum:
+                case displayName:
+                case description:
+                case example:
+                    outcome +=  "<li>" + rt.formatRAMLasHTML(false) + "</li>";
+                    break;
+                default:
+
+            }
+        }
+        outcome += "\n</ul></div>\n";
+        return outcome;
     }
 
     @Override
@@ -131,7 +149,7 @@ public class RAMLQueryParameterToken extends RAMLToken {
 
     @Override
     public String stringMe() {
-        String returnString = getThisManySpaces(this.indentSpaces) + this.qpParmName + ":" + "\n";
+        String returnString = getThisManySpaces(this.indentSpaces) + this.qpParmName + " " + "\n";
         for (int i=0; i<subtendingThings.size(); i++) {
             if (subtendingThings.get(i) != null) {
                 returnString += subtendingThings.get(i).stringMe();
@@ -139,6 +157,11 @@ public class RAMLQueryParameterToken extends RAMLToken {
             }
         }
         return returnString;
+    }
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.queryParameterNames;
     }
 
     public Boolean isEmpty() {

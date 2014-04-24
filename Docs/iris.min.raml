@@ -843,12 +843,38 @@ securitySchemes:
                                   </AccountProductsResponse>
             
             /origination: 
-                displayName: george
-                description: The george origination resource controls the Origination features and settings that can be added to an account.
+                
+                description: The Origination resource controls the Origination features and settings that can be added to an account.
                 
                 post:
                     description: |
                       Add Origination to the account.    
+                      The payload contains (optional) features that can be
+                      offered to the subscribers of the account  These features  are enabled for DIDs in 
+                      the account, but must still be provisioned on a DID-by-DID basis.
+                      
+                    body:
+                        application/xml:
+                            example: |
+                              <?xml version="1.0"?>
+                              <Product>
+                                  <Name>Origination</Name>
+                                  <Features>
+                                      <Feature>CallForwarding</Feature>
+                                      <Feature>DlDa</Feature>
+                                      <Feature>CNAM</Feature>
+                                  </Features>
+                              </Product>
+                
+                    responses:
+                        200:
+                          description: The Origination product and associated features was added to the account
+                        400:
+                          description: Some field error prevented the addition of the feature to the account.
+                
+                put:
+                    description: |
+                      Update Origination on the account.    
                       The payload contains (optional) features that can be 
                       offered to the subscribers of the account  These features  are enabled for DIDs in 
                       the account, but must still be provisioned on a DID-by-DID basis.
@@ -867,7 +893,7 @@ securitySchemes:
                 
                     responses:
                         200:
-                          description: The Origination feature was added to the account
+                          description: The Origination product and associated features was added to the account
                         400:
                           description: Some field error prevented the addition of the feature to the account.
                 
@@ -1769,7 +1795,10 @@ securitySchemes:
                             /{tn}: 
                                 get:
                                     description: |
-                                        Link for receiving information about telephone number. CallForward - Does this telephone number have call forwarding or not,
+                                        Link for receiving information about telephone number.
+                                
+                                        CallForward - Does this telephone number have call forwarding or not.
+                                
                                         CallingNameDisplay - Calling Name of the caller is available to the user or not on incoming calls.
                                     responses:
                                         200:
@@ -1797,7 +1826,6 @@ securitySchemes:
                                                     <FullNumber>2053778344</FullNumber>
                                                     <CallForward>7042661720</CallForward>
                                                     <CallingNameDisplay>true</CallingNameDisplay>
-                                                    <ResponseStatus></ResponseStatus>
                                                 </SipPeerTelephoneNumber>
                                     responses:
                                         200:
@@ -1809,6 +1837,7 @@ securitySchemes:
                                             body:
                                                 application/xml:
                                                     example: |
+                                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                                                         <SipPeerTelephoneNumberResponse>
                                                             <ResponseStatus>
                                                                 <ErrorCode>13576</ErrorCode>
@@ -2183,7 +2212,15 @@ securitySchemes:
                                     </NumberPortabilityResponse>
             
                     400:
-                        description: Bad Response - there were errors in evaluating the body of the request
+                        description: | 
+                            Bad Response - there were errors in evaluating the body of the request
+                            Potential errors include: <ul>
+                            <li> Un-supported losing carrier.
+                            <li> Unable to provide coverage.
+                            <li> Telephone number is already being processed on another order.
+                            <li> Rate Center Not Present in Bandwidth Dashboard.
+                            <li> Account not enabled for LNP 
+                            </ul> 
                         body: 
                             application/xml:
                                 example: |
@@ -2204,6 +2241,338 @@ securitySchemes:
             # values in curly braces will appear as fillable parameters in the URL
             # remember to fix these / delete these until the files are really there.
 
+        /importToAccount: 
+            displayName: importToAccount
+            description: |
+                TNs that have been ported directly with a trading partner may be imported to an account. For importing numbers, use the PST API.
+            get:
+                description: |
+                    A GET will return a list of the Import to Account orders that have previously performed on the account.  The query must always specify pagination parameters (size, page).  The results can also be optionally limited with start date and end date .
+                queryParameters:
+                    page:
+                        type: string
+                        required: true
+                        description: The starting value for pagination of the payload/.  Expect in the initial page case this is the ID of the first record.
+                        example: 1
+                    size:
+                        description: The number of records to return in a "page"
+                        type: string
+                        example: 300
+                    startdate:
+                        description: The starting date of a date range in the form yy-mm-yy
+                        type: string
+                        example: 13-12-01
+                    enddate:
+                        description: The ending date of a date range in the form yy-mm-yy
+                        type: string
+                        example: 13-12-31
+                responses:   
+                    200:
+                        description: |
+                            The response provides a list of all of the orders in the date range that have been issued against the account.
+            
+                            Included in the response for each order id (as applicable) are
+                            <ul>
+                            <li> the number of TNs in the order
+                            <li> the user that issued the order
+                            <li> the dates that the order was created and last lastModifiedDate
+                            <li> the order-ID
+                            <li> the status of the order
+                            <ul>
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <ResponseSelectWrapper>
+                                        <ListOrderIdUserIdDate>
+                                            <TotalCount>3</TotalCount>
+                                            <Links>
+                                                <first>Link=&lt;http://api.qa.inetwork.com/iris/accounts/12346099/importToAccount?page=1&amp;size=5&gt;;rel="first";</first>
+                                            </Links>
+                                            <OrderIdUserIdDate>
+                                                <CountOfTNs>0</CountOfTNs>
+                                                <userId>jbm</userId>
+                                                <lastModifiedDate>2013-12-06T15:26:29Z</lastModifiedDate>
+                                                <OrderDate>2013-12-06T15:26:29.443Z</OrderDate>
+                                                <orderId>82a09163-9a76-49bd-9e73-cbc3aaac1c20</orderId>
+                                                <OrderStatus>FAILED</OrderStatus>
+                                            </OrderIdUserIdDate>
+                                            <OrderIdUserIdDate>
+                                                <CountOfTNs>2</CountOfTNs>
+                                                <userId>jbm</userId>
+                                                <lastModifiedDate>2014-04-01T21:54:19Z</lastModifiedDate>
+                                                <OrderDate>2014-04-01T21:54:18.796Z</OrderDate>
+                                                <orderId>c5986599-3a7c-4eed-a5c4-9121c17d54ab</orderId>
+                                                <OrderStatus>COMPLETE</OrderStatus>
+                                                <TelephoneNumberDetails>
+                                                    <States>
+                                                        <StateWithCount>
+                                                            <State>CA</State>
+                                                            <Count>1</Count>
+                                                        </StateWithCount>
+                                                        <StateWithCount>
+                                                    ... SNIP ...
+                                                        </TierWithCount>
+                                                    </Tiers>
+                                                    <Vendors>
+                                                        <VendorWithCount>
+                                                            <VendorId>49</VendorId>
+                                                            <VendorName>Bandwidth CLEC</VendorName>
+                                                            <Count>3</Count>
+                                                        </VendorWithCount>
+                                                    </Vendors>
+                                                </TelephoneNumberDetails>
+                                            </OrderIdUserIdDate>
+                                        </ListOrderIdUserIdDate>
+                                    </ResponseSelectWrapper>
+                    404:
+                        description: a 404 is returned it no appropriate order resource was found.
+            
+            post:
+                description: | 
+                    Import a large number of previously ported or otherwise acquired numbers into the account
+            
+                    The various parameters in the importToAccount payload are...
+                            <table style="text-align: left; width: 80%;"
+                             border="1" cellpadding="2" cellspacing="2">
+                              <tbody>
+                                <tr>
+                                  <td>accountid</td>
+                                  <td>The numerical Account ID assigned to the Account.</td>
+                                </tr>
+                                <tr>
+                                  <td>SiteId</td>
+                                  <td>The ID of the Site that the set of TNs is to be associated with. </td>
+                                </tr>
+                                <tr>
+                                  <td>BatchId</td>
+                                  <td>A user-chosen id for thie batch of phone numbers.  This Batch ID can span multiple number submissions.  Up to 10 alphanumeric characters</td>
+                                </tr>
+                                <tr>
+                                  <td>BatchSize</td>
+                                  <td></td>
+                                </tr>
+                                <tr>
+                                  <td>ActivationDateTime</td>
+                                  <td>Total number of TNs to be imported.  This total spans API Calls, so if 3 calls are necessary to import 15000 numbers, this value would be 15000.</td>
+                                </tr>
+                                <tr>
+                                  <td>Immediate</td>
+                                  <td>An optional parameter that can be used to indicate that the numbers are to be activated in the network immediately</td>
+                                </tr>
+                                <tr>
+                                  <td>VendorName</td>
+                                  <td>The vendor that owns the number that is being ported in.  If the number is manually ported to a partner’s network then this would reflect that partner</td>
+                                </tr>
+                                <tr>
+                                  <td>OverridePortFees</td>
+                                  <td>If set to true the Project Port fees that would normally be applied will be ignored.</td>
+                                </tr>
+                                <tr>
+                                  <td>TelehoneNumberList</td>
+                                  <td>List of TNs to import</td>
+                                </tr>
+                              </tbody>
+                            </table>
+            
+                body:
+                    application/xml:
+                        example: |
+                            <?xml version="1.0"?>
+                            <ImportToAccountNumberOrder>
+                                <ImportToAccountNumberOrderType>
+                                    <TelephoneNumberList>
+                                        <TelephoneNumber>4158714244</TelephoneNumber>
+                                        <TelephoneNumber>6105330709</TelephoneNumber>
+                                    </TelephoneNumberList>
+                                    <OverridePortFees>false</OverridePortFees>
+                                    <PortedIn>true</PortedIn>
+                                    <ActivationDateTime>[Standard Data and Time]</ActivationDateTime>
+                                    <Immediate>[true|false]</Immediate>  <!-- Optional - decision to be made by DEV team -->
+                                    <VendorName>Level 3</VendorName>
+                                    <BatchId>TestId1234</BatchId>
+                                    <BatchSize>5</BatchSize>
+                                </ImportToAccountNumberOrderType>
+                                <SiteId>1</SiteId>
+                            </ImportToAccountNumberOrder>
+                responses:
+                    201:
+                        description: |
+                            The POST returns a payload that directly reflects the submission, along with a location header value that points the user to the order resource that is created by the POST request.
+                            The Location header value is in the form: GET ../accounts/<account-id>/importToAccount/<order-ID> 
+                                
+                        body: 
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    <ImportToAccountNumberOrderResponse>
+                                        <orderRequest>
+                                            <id>c5986599-3a7c-4eed-a5c4-9121c17d54ab</id>
+                                            <OrderCreateDate>2014-04-01T21:54:18.796Z</OrderCreateDate>
+                                            <ImportToAccountNumberOrderType>
+                                                <BatchId>SJM00001</BatchId>
+                                                <BatchSize>2</BatchSize>
+                                                <OverridePortFees>false</OverridePortFees>
+                                                <PortedIn>true</PortedIn>
+                                                <TelephoneNumberList>
+                                                    <TelephoneNumber>4158714245</TelephoneNumber>
+                                                    <TelephoneNumber>6105330710</TelephoneNumber>
+                                                </TelephoneNumberList>
+                                                <VendorName>Level 3</VendorName>
+                                            </ImportToAccountNumberOrderType>
+                                            <SiteId>743</SiteId>
+                                        </orderRequest>
+                                    </ImportToAccountNumberOrderResponse>
+            #
+            /{orderid}: 
+                
+                description: |
+                    Supplying an order id to the import to account API call will return a description of that order if the order-id is valid, and return a 404 otherwise.
+                get:
+                    responses:   
+                        200:
+                            description: An optional description of the response.
+                            body: 
+                                application/xml:
+                                    example: |
+                                        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <ImportToAccountNumberOrderResponse>
+                                            <ErrorList/>
+                                            <ImportedTelephoneNumberList>
+                                                <TelephoneNumber>9199918393</TelephoneNumber>
+                                                <TelephoneNumber>9199918394</TelephoneNumber>
+                                            </ImportedTelephoneNumberList>
+                                            <orderRequest>
+                                                <OrderCreateDate>2014-04-18T16:38:05.001Z</OrderCreateDate>
+                                                <PeerId>303716</PeerId>
+                                                <ImportToAccountNumberOrderType>
+                                                    <BatchId>TestId1234</BatchId>
+                                                    <BatchSize>2</BatchSize>
+                                                    <OverridePortFees>false</OverridePortFees>
+                                                    <PortedIn>false</PortedIn>
+                                                    <TelephoneNumberList>
+                                                        <TelephoneNumber>9199918393</TelephoneNumber>
+                                                        <TelephoneNumber>9199918394</TelephoneNumber>
+                                                    </TelephoneNumberList>
+                                                    <VendorName>Bandwidth CLEC</VendorName>
+                                                </ImportToAccountNumberOrderType>
+                                                <SiteId>743</SiteId>
+                                            </orderRequest>
+                                            <OrderStatus>COMPLETE</OrderStatus>
+                                            <ImportedTelephoneNumberDetailList>
+                                                <TelephoneNumberDetail>
+                                                    <FullNumber>9199918393</FullNumber>
+                                                </TelephoneNumberDetail>
+                                                <TelephoneNumberDetail>
+                                                    <FullNumber>9199918394</FullNumber>
+                                                </TelephoneNumberDetail>
+                                            </ImportedTelephoneNumberDetailList>
+                                        </ImportToAccountNumberOrderResponse>
+                        404:
+                            description: No import to account order resource was found - the order-id in the URL is likely in error.
+
+
+        /lineOptionOrders: 
+            post:
+                description: |
+                    This link is used for configuring multiple telephone numbers with such capabilities (tags):
+                    CNAM, NumberFormat, RPIDFormat, RewriteUser, and CallForward.
+            
+                    There are some possible values for tags
+            
+                        <TelephoneNumber>[10 D number]</TelephoneNumber>
+                        <CallingNameDisplay>[ { on | off } | unchanged | systemdefault ]</CallingNameDisplay>
+                        <NumberFormat>[ { 10digit | 11digit | e164 } | unchanged | systemdefault ]</NumberFormat>   
+                        <RPIDFormat>[ { 10digit | 11digit | e164 } | unchanged | systemdefault ]</RPIDFormat>  
+                        <RewriteUser>[ string | unchanged | systemdefault]</RewriteUser>   
+                        <CallForward>[ 10D | unchanged | systemdefault]</CallForward>  
+            
+                    systemdefault - implies that the element profile value should be removed so that the TN changes back to the default system behavior;
+                    remove - deletes the value for that TN - used for items that take a string/TN as the parameter;
+                    unchanged - the value should remain unchanged - implies a read before write model.
+                    
+                    Leaving the element out of the payload is equivalent to unchanged.
+                body:
+                    application/xml:
+                        example: | 
+                            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                <LineOptionOrder>
+                                    <TnLineOptions>
+                                        <TelephoneNumber>5209072451</TelephoneNumber>
+                                        <CallingNameDisplay>on</CallingNameDisplay>
+                                        <NumberFormat>unchanged</NumberFormat>   
+                                        <RPIDFormat>systemdefault</RPIDFormat>  
+                                        <RewriteUser>Antonio</RewriteUser>   
+                                        <CallForward>2033018394</CallForward>  
+                                    </TnLineOptions>
+                                </LineOptionOrder>
+                responses:
+                    200:
+                        description: |
+                            There can be only CompletedNumbers in the returned body of response. It means that all telephone numbers have been successfully provisioned.
+                            Also Errors can be present if telephone numbers didn't pass a validation.
+                        body:
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <LineOptionOrderResponse>
+                                            <LineOptions>
+                                                <CompletedNumbers>
+                                                    <TelephoneNumber>5209072451</TelephoneNumber>
+                                                </CompletedNumbers>
+                                                <Errors>
+                                                    <Error>
+                                                        <TelephoneNumber>2033018394</TelephoneNumber>
+                                                        <ErrorCode>5005</ErrorCode>
+                                                        <Description>Telephone Number Unavailable</Description>
+                                                    </Error>
+                                                </Errors>
+                                            </LineOptions>
+                                        </LineOptionOrderResponse>
+                    400:
+                        description: |
+                            Possible errors in response:  
+                            50xx "Telephone number is invalid"  
+                            50xx "Telephone number is not available on the system"  
+                            50xx "Duplicate telephone number"  
+                            50xx "Telephone number is required"     
+                            50xx "Telephone number is not available"  
+                            50xx "There is an issue with telephone number. Please contact Customer Service."  
+                            50xx "There are no valid telephone numbers"   
+                            50xx "Account has no 'CNAM'/ 'CallForward' product feature"    
+                            50xx "CallingNameDisplay '--' is invalid. Valid values are: on, off, unchanged, systemdefault"    
+                            50xx "Call Forwarding number '--' is not a valid 10-digit telephone number"   
+                            50xx "Number Format '--' is invalid"   
+                            50xx "Rewrite User '--' is invalid"   
+                            50xx "RPID Format '--' is invalid"    
+                        body:
+                            application/xml:
+                                example: |
+                                    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                        <LineOptionOrderResponse>
+                                            <ResponseStatus>
+                                                <Description>Validation Failed. Please check your input parameters.</Description>
+                                            </ResponseStatus>
+                                            <LineOptions>
+                                                <Errors>
+                                                    <Error>
+                                                        <TelephoneNumber>5209072451</TelephoneNumber>
+                                                        <ErrorCode>5072</ErrorCode>
+                                                        <Description>Duplicate telephone number</Description>
+                                                    </Error>
+                                                    <Error>
+                                                        <TelephoneNumber>2033018394</TelephoneNumber>
+                                                        <ErrorCode>5005</ErrorCode>
+                                                        <Description>Telephone Number Unavailable</Description>
+                                                    </Error>
+                                                </Errors>
+                                            </LineOptions>
+                                        </LineOptionOrderResponse>
+                    401: 
+                        description: |
+                            If customer doesn't have a permissions for this link (required role: ROLE_API_CNAMLIDB), this error can appear                    
+
+        
 
 
 /tns: 

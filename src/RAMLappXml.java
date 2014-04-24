@@ -17,6 +17,11 @@ public class RAMLappXml extends RAMLToken {
     }
 
     @Override
+    markupType getMarkupType() {
+        return markupType.applicationXML;
+    }
+
+    @Override
     String vaccuumRAMLFIle(Scanner example, String currentLine) {
 
         // currentLine contains a line that should contain only "application/xml"
@@ -78,8 +83,19 @@ public class RAMLappXml extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML(Boolean removeTokenName) {
+        // never display the token
+        String outcome = "\n<div>\n";
+        for (RAMLToken rt : subtendingThings) {
+            if (rt.getMarkupType() == markupType.description) outcome += rt.formatRAMLasHTML(true);
+        }
+        for (RAMLToken rt : subtendingThings) {
+            if ((rt.getMarkupType() == markupType.example) || (rt.getMarkupType() == markupType.schema) )
+                //  display the "example:"
+                outcome += rt.formatRAMLasHTML(false);
+        }
+        outcome += "\n</div>\n";
+        return outcome;
     }
 
     @Override

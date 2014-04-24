@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -6,6 +7,7 @@ import java.util.Scanner;
  */
 
 /*  todo - move common stuff into the superclass
+    todo - escape the < and > in the example and schema classes.
    the general pattern is...
    token: {t2}  {rest-of-line}
        {body}
@@ -28,9 +30,14 @@ abstract class RAMLToken {
 
     abstract String vaccuumRAMLFIle (Scanner example, String currentLine);
 
-    abstract String formatRAMLasHTML ( RAMLToken toFormat);
+    abstract String formatRAMLasHTML(
+            // String cssReformatClass,
+            Boolean removeTokenName);
+    // removeTokenName = true --> remove the name of the RAML Token, false, means print the name of the token
 
     abstract void spewRAMLFile (String toSave);
+
+    abstract markupType getMarkupType();
 
     public abstract String stringMe();
 
@@ -104,9 +111,12 @@ abstract class RAMLToken {
         return outString;
     }
 
-     // todo: 1) read in a file and create and populate a single RAMLToken object of any type whatsoever
-     // todo: 2) create the main class that reads in an array of RAMLTokens of different types.
+
+     // done: 1) read in a file and create and populate a single RAMLToken object of any type whatsoever
+     // done: 2) create the main class that reads in an array of RAMLTokens of different types.
      // todo: Could I generalize this even more by giving all non-leaf-nodes a list of the markupTypes that they understand, and making the parsing uniform ?  There might have to be a generic pre-processing step to allow the detection and formatting of the more diverse members of the universe.
+     // todo: make the html generation create an aggregate title of all of the elements of the Resource Path.
+
 
 }
 

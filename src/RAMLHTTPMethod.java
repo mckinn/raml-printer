@@ -6,7 +6,7 @@ import java.util.Scanner;
  */
 public class RAMLHTTPMethod extends RAMLToken{
 
-    ArrayList<RAMLToken> subtendingThings;
+    RAMLTokenList subtendingThings;
     String methodName;
     int numberOfThings;
     int indentSpaces;
@@ -14,9 +14,13 @@ public class RAMLHTTPMethod extends RAMLToken{
     RAMLHTTPMethod (String typeOfMethod, int ids) {
         methodName = typeOfMethod;
         numberOfThings = 0;
-        subtendingThings = new ArrayList<RAMLToken>();
+        subtendingThings = new RAMLTokenList();
         indentSpaces = ids;
 
+    }
+
+    public String getMethodName() {
+        return methodName;
     }
 
     String vaccuumRAMLFIle (Scanner example, String currentLine){
@@ -67,11 +71,6 @@ public class RAMLHTTPMethod extends RAMLToken{
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
-                case otcoThorpe:
-                    ramlEntity = new RAMLComment();
-                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
-                    successful = true;
-                    break;
                 default:
                     System.out.println("default string token = "+ importantInformation.getFirstToken());
             }
@@ -86,8 +85,33 @@ public class RAMLHTTPMethod extends RAMLToken{
         return currentLine;
     }
 
-    String formatRAMLasHTML ( RAMLToken toFormat){
-        return "RAML as HTML";
+    @Override
+    String formatRAMLasHTML(Boolean removeTokenName){
+//        return "\n<xmp>\n" + this.stringMe() + "\n</xmp>\n";
+
+        RAMLToken rat;
+
+        String outcome = "\n<div><!-- in httpMethod -->\n" +
+                "<h3 class = \"" + markupType.httpMethod.CSSClass() + "\"> " + this.methodName.toUpperCase() +" </h3><div class=\"hangingindent\">";
+
+        if ((rat = subtendingThings.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        if ((rat = subtendingThings.findMarkupType(markupType.queryParameters)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        if ((rat = subtendingThings.findMarkupType(markupType.body)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        for (RAMLToken rt: subtendingThings){
+            if (rt.getMarkupType() == markupType.responses) {
+                outcome += rt.formatRAMLasHTML(false);
+            }
+        }
+        outcome += "\n</div>\n</div>\n";
+        return outcome;
+    }
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.httpMethod;
     }
 
     void spewRAMLFile (String toSave){}

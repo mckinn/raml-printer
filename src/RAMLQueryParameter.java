@@ -10,13 +10,13 @@ public class RAMLQueryParameter extends RAMLToken {
     // Descriptions
 
     int indentSpaces;
-    ArrayList<RAMLToken> subtendingThings;
+    RAMLTokenList subtendingThings;
     int numberOfThings;
 
     public RAMLQueryParameter(int indentSpaces) {
         this.indentSpaces = indentSpaces;
         indentSpaces = 0;
-        subtendingThings = new ArrayList<RAMLToken> ();
+        subtendingThings = new RAMLTokenList();
         numberOfThings = 0;
     }
 
@@ -71,8 +71,43 @@ public class RAMLQueryParameter extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML(Boolean removeTokenName) {
+        // return this.stringMe();
+        // never display "queryParameter"
+
+        String outcome = "\n<div><!-- in queryParameter -->\n" +
+                "<h4 class = \"" + markupType.queryParameters.CSSClass() + "\"> Query Parameters </h4>";
+
+        if (!subtendingThings.isEmpty()) {
+            outcome += "<table style=\"text-align: left;\" " +
+                    " border=\"1\" cellpadding=\"2\" cellspacing=\"2\"> " +
+                    "  <tbody>\n";
+            int i = 0;
+            for (RAMLToken rt : subtendingThings) {
+                if ((i % 3) == 0) {
+                    outcome += "<tr>"; }
+                outcome += "<td  style=\"vertical-align: top;\" >";
+                if (rt.getMarkupType() == markupType.queryParameterNames) {
+                    outcome += rt.formatRAMLasHTML(false);
+                }
+                outcome += "</td>";
+
+                i++;
+                if ((i % 3) == 0) {
+                    outcome += "</tr>"; }
+            }
+            outcome += "  </tbody>\n" +
+                    "</table>\n";
+        }
+
+        outcome += "\n</div>\n";
+        return outcome;
+    }
+
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.queryParameters;
     }
 
     @Override

@@ -1,16 +1,21 @@
 import java.util.Scanner;
 
 /**
- * Created by Dad on 3/9/14.
+ * Created by smckinnon on 4/18/14.
  */
-public class RAMLMultiLine extends RAMLToken {
+
+public class RAMLQPTokenValue extends RAMLToken {
+
+    // This class is the very simple unformatted content that is contained under a QueryParameter Token
+    // This is very similar to a SingleLine, except that the markuptypes do not have their own formatting type.
+
 
     boolean pipedContent;
     markupType tokenType;
     String theRealContent;
     int indentSpaces;
 
-    RAMLMultiLine(markupType mt, int is) {
+    RAMLQPTokenValue(markupType mt, int is) {
         this.pipedContent = false;
         this.tokenType = mt;
         this.indentSpaces = is;
@@ -65,8 +70,6 @@ public class RAMLMultiLine extends RAMLToken {
 
         }
         while (currentLine.trim().equals("") && example.hasNextLine()) {
-            // we are trying to return an empty string, which will be confusing,
-            // gotta fix this.
             currentLine = getNextNonNullString(example, false);
         }
         return currentLine;
@@ -74,37 +77,20 @@ public class RAMLMultiLine extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(Boolean removeTokenName) {
-        String result = "";
-        String nameToken = (removeTokenName ? "" : "<b>" + (markupType.markupTypeToString(tokenType)) + "</b>\n");
+    String formatRAMLasHTML( Boolean removeTokenName) {
 
-        switch(this.tokenType) {
-            case description:
-                result = "\n<span class = " + this.tokenType.CSSClass() + ">\n" + nameToken +
-                        this.theRealContent + "\n" +
-                        "</span>\n";
-                break;
-            case example:
-                result = "\n<span class = \" bold\">" + nameToken + "</span>" +
-                        "\n<pre class = \"" + markupType.example.CSSClass() + "\">\n" +
-                        (this.theRealContent.replace("<", "&lt;")).replace(">", "&gt;") + "\n" +
-                        "</pre>";
-                break;
-            case schema:
-                result = "\n<span class = \" bold\">" + nameToken + "</span>" +
-                        "\n<pre class = \"" + markupType.schema.CSSClass() + "\">\n"  +
-                        (this.theRealContent.replace("<", "&lt;")).replace(">", "&gt;") + "\n" +
-                        "</pre>";
-                break;
-            default:
-                result = "\n<span class = \"" + this.tokenType.CSSClass() + "\">\n"  + nameToken +
-                        this.theRealContent +
-                        "\n</span>\n";
-                break;
+        String toReturn = "";
+
+        if (!removeTokenName) {
+            toReturn = "<span class = \"" + markupType.qpDefault.CSSClass() + "\" style = \"font-weight: bold;\" >" + markupType.markupTypeToString(this.tokenType) + "</span>" ;
         }
-        return result;
+        toReturn +=  "<span class = \"" + markupType.qpDefault  // this.tokenType.CSSClass()
+                + "\" > " + this.theRealContent + "</span> <br>";
+
+        return toReturn;
     }
 
+    @Override
     void spewRAMLFile(String toSave) {
     }
 
@@ -128,3 +114,4 @@ public class RAMLMultiLine extends RAMLToken {
         return tString;
     }
 }
+

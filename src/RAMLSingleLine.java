@@ -22,7 +22,7 @@ public class RAMLSingleLine extends RAMLToken {
     String vaccuumRAMLFIle(Scanner example, String currentLine) {
 
         Scanner s = new Scanner(currentLine);
-        s.next();                        // scan past the first token, which should be description:
+        s.next();                        // scan past the first token, which should be the token describing the kind of single line element:
 
         lineOfRamlText dataAboutTheLine = new lineOfRamlText(currentLine);
 
@@ -33,8 +33,17 @@ public class RAMLSingleLine extends RAMLToken {
     }
 
     @Override
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return null;
+    String formatRAMLasHTML( Boolean removeTokenName) {
+
+        String toReturn = "";
+
+        if (!removeTokenName) {
+            toReturn = "<span class = \"" + this.tokenType.CSSClass() + "\" style = \"font-weight: bold;\" >" + markupType.markupTypeToString(this.tokenType) + "</span>" ;
+        }
+        toReturn +=  "<span class = \"" + this.tokenType.CSSClass()  // this.tokenType.CSSClass()
+                 + "\" >" + this.theRealContent + "</span> <br>";
+
+        return toReturn;
     }
 
     @Override
@@ -43,7 +52,17 @@ public class RAMLSingleLine extends RAMLToken {
     }
 
     @Override
+    markupType getMarkupType() {
+        return this.tokenType;
+    }
+
+    @Override
     public String stringMe() {
-        return getThisManySpaces(this.indentSpaces) + markupType.markupTypeToString(this.tokenType) + ": " + this.theRealContent;
+        return getThisManySpaces(this.indentSpaces) + markupType.markupTypeToString(this.tokenType) + " " + this.theRealContent;
+    }
+
+    @Override
+    public String toString () {
+        return this.theRealContent;
     }
 }

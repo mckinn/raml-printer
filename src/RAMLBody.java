@@ -77,8 +77,21 @@ public class RAMLBody extends RAMLToken {
         return currentLine;
     }
 
-    String formatRAMLasHTML(RAMLToken toFormat) {
-        return "RAML as Body";
+    String formatRAMLasHTML(Boolean removeTokenName) {
+        // ignore removeTokenName = never print the "body:"
+        // we expect a description and an application/xml
+        String outcome = "\n<div>\n";
+        for (RAMLToken rt : subtendingThings) {
+            if (rt.getMarkupType() == markupType.description) outcome += rt.formatRAMLasHTML(true);
+            if (rt.getMarkupType() == markupType.applicationXML) outcome += rt.formatRAMLasHTML(true);
+        }
+        outcome += "\n</div>\n";
+        return outcome;
+    }
+
+    @Override
+    markupType getMarkupType() {
+        return markupType.body;
     }
 
     void spewRAMLFile (String toSave){}

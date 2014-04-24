@@ -21,7 +21,10 @@ public enum markupType {
     qpDefault,
     qpEnum,
     displayName,
-    otcoThorpe,
+    title,
+    baseUri,
+    version,
+    securedBy,
     unknown;
 
     // todo make these methods executable on markupType objects.  I suspect that it involves removing the "static" designation.
@@ -47,22 +50,25 @@ public enum markupType {
         else if (inputString.equals("default:")) return qpDefault;
         else if (inputString.equals("enum:")) return qpEnum;
         else if (inputString.equals("displayName:")) return displayName;
+        else if (inputString.equals("title:")) return title;
+        else if (inputString.equals("baseUri:")) return baseUri;
+        else if (inputString.equals("version:")) return version;
+        else if (inputString.equals("securedBy:")) return securedBy;
         // check for the patterns in decreasing levels of specificity
         else if (!RAMLPathElement.checkPathElementPattern(inputString).equals(""))  return pathElement;
         else if (!RAMLResponsesValues.checkResponseCodePattern(inputString).equals(""))  return responsesvalues;
         else if (!RAMLQueryParameterToken.checkQueryParameterNamePattern(inputString).equals(""))  return queryParameterNames;
 
-        else if (inputString.equals("#")) return otcoThorpe;
         else return unknown;
     }
 
     public static String markupTypeToString ( markupType mt ) {
         switch (mt) {
             case description: return "description:" ;
-            case httpMethod: return "description:" ;
-            case body: return "description:" ;
+            case httpMethod: return "get,  post, put, delete:" ;
+            case body: return "body:" ;
             case pathElement: return "path/:" ;
-            case applicationXML: return "application/xml::" ;
+            case applicationXML: return "application/xml:" ;
             case schema: return "schema:" ;
             case example: return "example:" ;
             case responses: return "responses:" ;
@@ -77,10 +83,45 @@ public enum markupType {
             case qpDefault: return "default:" ;
             case qpEnum: return "enum:" ;
             case displayName: return "displayName:" ;
-            case otcoThorpe: return "# " ;
+            case title: return "title:" ;
+            case baseUri: return "baseUri:" ;
+            case version: return "version:" ;
+            case securedBy: return "securedBy:" ;
+
             case unknown: return "*** UNKNOWN ***:" ;
         }
         return "*** UNKNOWN ***";
+    }
+
+    public  String CSSClass ( ) {
+        switch (this) {
+            case description: return "descriptionCSS" ;
+            case httpMethod: return "httpMethodCSS" ;
+            case body: return "bodyCSS" ;
+            case pathElement: return "pathCSS" ;
+            case applicationXML: return "appxmlCSS" ;
+            case schema: return "schemaCSS" ;
+            case example: return "exampleCSS" ;
+            case responses: return "responsesCSS" ;
+            case responsesvalues: return "responseCodesCSS" ;
+            case queryParameters: return "queryParametersCSS" ;
+            case queryParameterNames: return "qpNamesCSS" ;
+            case qpType: return "qpCSS" ;
+            case qpMaximim: return "qpCSS" ;
+            case qpMinimum: return "qpCSS" ;
+            case qpRequired: return "qpCSS" ;
+            case qpRepeat: return "qpCSS" ;
+            case qpDefault: return "qpCSS" ;
+            case qpEnum: return "qpCSS" ;
+            case displayName: return "displayNameCSS" ;
+            case title: return "titleCSS" ;
+            case baseUri: return "baseUriCSS" ;
+            case version: return "versionCSS" ;
+            case securedBy: return "securedByCSS" ;
+
+            case unknown: return "noCSS" ;
+        }
+        return "noCSS";
     }
 }
 
