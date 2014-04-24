@@ -2,7 +2,9 @@
 ## Intellij
 #################
 .idea/
-.out/
+out/
+out/production/
+out/production/raml-printer
 *.iml
 *.iws
 
