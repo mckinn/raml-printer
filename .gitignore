@@ -4,7 +4,7 @@
 .idea/
 out/
 out/production/
-out/production/raml-printer
+out/production/raml-printer/
 *.iml
 *.iws
 
