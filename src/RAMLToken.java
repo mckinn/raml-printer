@@ -28,7 +28,7 @@ import java.util.Scanner;
  */
 abstract class RAMLToken {
 
-    abstract String vaccuumRAMLFIle (Scanner example, String currentLine);
+    abstract String vaccuumRAMLFIle (RAMLScanner example, String currentLine);
 
     abstract String formatRAMLasHTML(
             // String cssReformatClass,
@@ -65,7 +65,7 @@ abstract class RAMLToken {
         }
     }
 
-    public static String getNextNonNullString(Scanner example, Boolean preserveBlankLines) {
+    /*public static String getNextNonNullStringx(Scanner example, Boolean preserveBlankLines) {
         // get the next line to process, eliminating blank lines and comments.
         if (example.hasNextLine()) {
             String returnValue = example.nextLine();
@@ -83,7 +83,7 @@ abstract class RAMLToken {
             System.out.println("*** The End ***");
             return "";
         }
-    }
+    }*/
 
     public static String getThisManySpaces(int length) {
         if (length > 0) {

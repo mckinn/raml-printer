@@ -23,7 +23,7 @@ public class RAMLHTTPMethod extends RAMLToken{
         return methodName;
     }
 
-    String vaccuumRAMLFIle (Scanner example, String currentLine){
+    String vaccuumRAMLFIle (RAMLScanner example, String currentLine){
 
         // while the number of spaces is current-number + 4
         //     look for a description or a body
@@ -40,10 +40,10 @@ public class RAMLHTTPMethod extends RAMLToken{
         lineOfRamlText importantInformation = new lineOfRamlText(currentLine);
         this.indentSpaces = importantInformation.getLeadingSpaces();
 
-        currentLine = getNextNonNullString(example, false);
+        currentLine = example.getNextNonNullString(false);
         importantInformation = new lineOfRamlText(currentLine);
 
-        while (example.hasNextLine() && (importantInformation.getLeadingSpaces() > this.indentSpaces)) {
+        while (example.getScanner().hasNextLine() && (importantInformation.getLeadingSpaces() > this.indentSpaces)) {
             successful = false;
             ramlEntity = null;
 
@@ -72,13 +72,13 @@ public class RAMLHTTPMethod extends RAMLToken{
                     successful = true;
                     break;
                 default:
-                    System.out.println("default string token = "+ importantInformation.getFirstToken());
+                    System.out.println("Warning: default or unknown token in HTTP Method at line "+ example.getLine() + " for token: "+ importantInformation.getFirstToken());
             }
             if (successful) {
                 subtendingThings.add(this.numberOfThings, ramlEntity);
                 this.numberOfThings ++;
             } else {
-                currentLine = getNextNonNullString(example, false);
+                currentLine = example.getNextNonNullString(false);
             }
             importantInformation = new lineOfRamlText(currentLine);
         }

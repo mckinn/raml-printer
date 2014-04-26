@@ -20,7 +20,7 @@ public class ProcessRAMLFile {
         RAMLToken ramlEntity;
         markupType mut;
 
-        Scanner example = getInputStream();
+        RAMLScanner example = getInputStream();
 /*        try {
             example = new Scanner(new File("C:\\Users\\smckinnon\\Documents\\GitHub\\raml-printer\\Docs\\iris.min.raml"));
             //example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));
@@ -31,9 +31,9 @@ public class ProcessRAMLFile {
         int arrayPosition = 0;
         assert example != null;
 
-        String followingLine = RAMLToken.getNextNonNullString(example, false);
+        String followingLine = example.getNextNonNullString(false);
 
-        while (example.hasNextLine()) {
+        while (example.getScanner().hasNextLine()) {
             successful = false;
             ramlEntity = null;
 
@@ -67,7 +67,7 @@ public class ProcessRAMLFile {
                         followingLine = ramlEntity.vaccuumRAMLFIle(example,followingLine);
                         successful = true;
                     } else {
-                        System.out.println("*** Error: bad token in Paths list: " + token );
+                        System.out.println("Error: bad token in Paths list at line:" + example.getLine() + " for token: " + token );
                     }
                     break;
 
@@ -81,7 +81,7 @@ public class ProcessRAMLFile {
                     break;
                 case unknown:
                 default: {
-                    System.out.println("default / unknown string token = "+token);
+                    System.out.println("Warning: default or unknown token at line "+ example.getLine() + " for token: " +token);
 
                 }
             }
@@ -89,12 +89,10 @@ public class ProcessRAMLFile {
                 documentComponents.add(arrayPosition, ramlEntity);
                 arrayPosition ++;
             } else {
-                followingLine = RAMLToken.getNextNonNullString(example, false);
+                followingLine = example.getNextNonNullString( false);
             }
 
         }
-
-        System.out.println("**********************************************************************************");
 
         PrintStream out = getOutputPrintStream();
         String outcome;
@@ -167,7 +165,7 @@ public class ProcessRAMLFile {
         return out;
     }
 
-    public static Scanner getInputStream() {
+    public static RAMLScanner getInputStream() {
 
         Scanner console = new Scanner(System.in);
         System.out.print("Enter input file path and name: ");
@@ -192,7 +190,7 @@ public class ProcessRAMLFile {
                 }
             }
         } while (out == null);
-        return out;
+        return new RAMLScanner(out);
     }
 
 

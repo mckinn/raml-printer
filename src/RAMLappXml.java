@@ -22,7 +22,7 @@ public class RAMLappXml extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         // currentLine contains a line that should contain only "application/xml"
         // The following lines should contain descriptions, examples, and schema
@@ -38,10 +38,10 @@ public class RAMLappXml extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, false); // the first line of the rest of the payload.
+        currentLine = example.getNextNonNullString(false); // the first line of the rest of the payload.
         importantInformation = new lineOfRamlText(currentLine);
 
-        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.getScanner().hasNextLine()) {
 
             switch(markupType.stringToMarkuptype(importantInformation.getFirstToken())){
                 // todo - create a mut variable and the three cases below can be collapsed into one
@@ -74,7 +74,7 @@ public class RAMLappXml extends RAMLToken {
                 numberOfThings++;
                 successful = false;
             } else {
-                currentLine = getNextNonNullString(example, false);
+                currentLine = example.getNextNonNullString(false);
             }
 
         }

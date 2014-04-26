@@ -19,7 +19,7 @@ public class RAMLSingleLine extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         Scanner s = new Scanner(currentLine);
         s.next();                        // scan past the first token, which should be the token describing the kind of single line element:
@@ -28,7 +28,7 @@ public class RAMLSingleLine extends RAMLToken {
 
         this.theRealContent = s.nextLine();
         this.indentSpaces = dataAboutTheLine.getLeadingSpaces();
-        return getNextNonNullString(example, false);    // advance the file scanner and return a line.
+        return example.getNextNonNullString(false);    // advance the file scanner and return a line.
 
     }
 

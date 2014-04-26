@@ -21,7 +21,7 @@ public class RAMLQueryParameter extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         RAMLToken ramlEntity;
         Boolean successful;
@@ -36,10 +36,10 @@ public class RAMLQueryParameter extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, false);
+        currentLine = example.getNextNonNullString(false);
         importantInformation = new lineOfRamlText(currentLine);
 
-        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.getScanner().hasNextLine()) {
 
             // extract the proposed token.  If null then there was an error
             token = RAMLQueryParameterToken.checkQueryParameterNamePattern(currentLine);

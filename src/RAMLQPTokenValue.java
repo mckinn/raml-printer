@@ -22,7 +22,7 @@ public class RAMLQPTokenValue extends RAMLToken {
         this.theRealContent = "";
     }
 
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         String token;
 
@@ -38,22 +38,22 @@ public class RAMLQPTokenValue extends RAMLToken {
             // currentLine = getNextNonNullString(example, false);
             // assume if we are in multi-line and missing both a token and a pipe
             // that we must need a pipe.
-            System.out.println("*** Warning - missing a pipe");
+            System.out.println("Warning: missing a pipe in Query Parameter description: at line "+ example.getLine());
             token = "|";
         }
         if (token.charAt(0) != '|') {
             this.theRealContent = importantInformation.getRestOfTheLine().trim();
             this.pipedContent = false;
-            currentLine = getNextNonNullString(example, false);
+            currentLine = example.getNextNonNullString(false);
         } else {
             // step forward and start getting lines
 
-            currentLine = getNextNonNullString(example, true);
+            currentLine = example.getNextNonNullString(true);
             importantInformation = new lineOfRamlText(currentLine);
 
             while (((importantInformation.getLeadingSpaces() > this.indentSpaces)
                     || (importantInformation.getFirstToken().equals("")))
-                    && example.hasNextLine()) {
+                    && example.getScanner().hasNextLine()) {
 
                 if (importantInformation.getFirstToken().equals("")) {
                     descriptionFromFile += "\n";
@@ -61,7 +61,7 @@ public class RAMLQPTokenValue extends RAMLToken {
                     descriptionFromFile += currentLine.substring(this.indentSpaces, currentLine.length()) + "\n";
                 }
 
-                currentLine = getNextNonNullString(example, true);
+                currentLine = example.getNextNonNullString(true);
                 importantInformation = new lineOfRamlText(currentLine);
 
             }
@@ -69,8 +69,8 @@ public class RAMLQPTokenValue extends RAMLToken {
             this.pipedContent = true;
 
         }
-        while (currentLine.trim().equals("") && example.hasNextLine()) {
-            currentLine = getNextNonNullString(example, false);
+        while (currentLine.trim().equals("") && example.getScanner().hasNextLine()) {
+            currentLine = example.getNextNonNullString(false);
         }
         return currentLine;
 

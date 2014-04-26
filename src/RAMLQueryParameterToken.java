@@ -51,7 +51,7 @@ public class RAMLQueryParameterToken extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         // The RAMLQueryParameterToken on which this was called may or may not be full.
 
@@ -68,10 +68,10 @@ public class RAMLQueryParameterToken extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, false);
+        currentLine = example.getNextNonNullString(false);
         importantInformation = new lineOfRamlText(currentLine);
 
-        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.getScanner().hasNextLine()) {
 
             switch (mut = markupType.stringToMarkuptype(importantInformation.getFirstToken())) {
                 case description:
@@ -96,7 +96,7 @@ public class RAMLQueryParameterToken extends RAMLToken {
                     break;
                 case unknown:
                 default:
-                    System.out.println("Bad token in Query Parameter Token List: " + importantInformation.getFirstToken() );
+                    System.out.println("Warning: default or unknown token in Query Parameters token list: at line "+ example.getLine() + " for token: " + importantInformation.getFirstToken() );
                     break;
             }
             importantInformation = new lineOfRamlText(currentLine);
@@ -105,7 +105,7 @@ public class RAMLQueryParameterToken extends RAMLToken {
                 numberOfThings++;
                 successful = false;
             } else {
-                currentLine = getNextNonNullString(example, false);
+                currentLine = example.getNextNonNullString(false);
             }
 
         }

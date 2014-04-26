@@ -27,7 +27,7 @@ public class RAMLPathElement extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         // A pathElement can contain...
         // - a description
@@ -47,10 +47,10 @@ public class RAMLPathElement extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, false);
+        currentLine = example.getNextNonNullString(false);
         importantInformation = new lineOfRamlText(currentLine);
 
-        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.getScanner().hasNextLine()) {
 
             // all of the following tokens are either responses "nnn:" or descriptions
             // extract the proposed token.  If null then there was an error
@@ -78,8 +78,8 @@ public class RAMLPathElement extends RAMLToken {
                         currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                         successful = true;
                     } else {
-                        System.out.println("*** Error: bad token in Paths list: " + token + " --- " + currentLine);
-                        currentLine = getNextNonNullString(example, false);
+                        System.out.println("Warning: default or unknown token in resource path: at line "+ example.getLine() + " for token: " + token);
+                        currentLine = example.getNextNonNullString(false);
                     }
                 }
             }

@@ -26,7 +26,7 @@ public class RAMLResponsesValues extends RAMLToken {
     }
 
     @Override
-    String vaccuumRAMLFIle(Scanner example, String currentLine) {
+    String vaccuumRAMLFIle(RAMLScanner example, String currentLine) {
 
         RAMLToken ramlEntity;
         Boolean successful;
@@ -45,10 +45,10 @@ public class RAMLResponsesValues extends RAMLToken {
         successful = false;
         ramlEntity = null;
 
-        currentLine = getNextNonNullString(example, false);
+        currentLine = example.getNextNonNullString(false);
         importantInformation = new lineOfRamlText(currentLine);
 
-        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.hasNextLine()) {
+        while ((importantInformation.getLeadingSpaces() > this.indentSpaces) && example.getScanner().hasNextLine()) {
 
             // extract the proposed token.  this token should be the first token on the current row,
             // either description or application/xml.
@@ -70,7 +70,7 @@ public class RAMLResponsesValues extends RAMLToken {
                     successful = true;
                     break;
                 default:
-                    System.out.println("Something went wrong in ResponseCode" + this.responseCode + ": with " + importantInformation.getFirstToken());
+                    System.out.println("Warning: default or unknown token in response code: = " + this.responseCode + ":  at line "+ example.getLine() + " for token:  " + importantInformation.getFirstToken());
             }
 
             importantInformation = new lineOfRamlText(currentLine);
@@ -79,7 +79,7 @@ public class RAMLResponsesValues extends RAMLToken {
                 numberOfThings++;
                 successful = false;
             } else {
-                currentLine = getNextNonNullString(example, false);
+                currentLine = example.getNextNonNullString(false);
             }
         }
         return currentLine;
