@@ -10,14 +10,16 @@ public class RAMLQueryParameter extends RAMLToken {
     // Descriptions
 
     int indentSpaces;
+    private String markupName;
     RAMLTokenList subtendingThings;
     int numberOfThings;
 
-    public RAMLQueryParameter(int indentSpaces) {
+    public RAMLQueryParameter(int indentSpaces, String name) {
         this.indentSpaces = indentSpaces;
         indentSpaces = 0;
         subtendingThings = new RAMLTokenList();
         numberOfThings = 0;
+        markupName = name;
     }
 
     @Override
@@ -76,7 +78,7 @@ public class RAMLQueryParameter extends RAMLToken {
         // never display "queryParameter"
 
         String outcome = "\n<div><!-- in queryParameter -->\n" +
-                "<h4 class = \"" + markupType.queryParameters.CSSClass() + "\"> Query Parameters </h4>";
+                "<h4 class = \"" + markupType.queryParameters.CSSClass() + "\"> "+ this.getMarkupName() + " </h4>";
 
         if (!subtendingThings.isEmpty()) {
             outcome += "<table style=\"text-align: left;\" " +
@@ -125,5 +127,14 @@ public class RAMLQueryParameter extends RAMLToken {
             }
         }
         return returnString;
+    }
+
+
+    public String getMarkupName() {
+        return markupName;
+    }
+
+    public void setMarkupName(String markupName) {
+        this.markupName = markupName;
     }
 }

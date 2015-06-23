@@ -67,7 +67,7 @@ public class RAMLHTTPMethod extends RAMLToken{
                     successful = true;
                     break;
                 case queryParameters:
-                    ramlEntity = new RAMLQueryParameter(importantInformation.getLeadingSpaces());
+                    ramlEntity = new RAMLQueryParameter(importantInformation.getLeadingSpaces(), "Query Parameters");
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;

@@ -1,0 +1,41 @@
+
+Notes on the HTML Design
+
+The basic structure of the paths element is to process the top-level description first, the subtending methods next, and then any follow-on paths later.
+For the paths element we will need to retain the aggregate path as an input, as well as a level value.
+For most elements they will be independent of the heading level of the overall path.
+
+note - <textarea> might be useful.
+
+
+.xml {
+    background-color:#EEEEEE; border:2px solid red;
+    border-radius:0.5em;
+    font-size:14px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    box-sizing:border-box;
+    width:70%;
+    }
+.none {}
+.information {font-style:italic;}
+.title  {
+    text-align:center;
+    text-decoration:underline;
+}
+.pathname {text-align:center;}
+.description {
+    border:1px solid blue;
+    border-radius:0.5em;
+    font-size:14px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    box-sizing:border-box;
+    width:70%;
+}
+.httpMethod {
+    text-decoration:bold;
+    font-size:18px;
+    }
+.responses {
+    text-decoration:bold;
+    font-size:18px;
+    }

@@ -143,7 +143,9 @@ public class ProcessRAMLFile {
         System.out.print("Enter output file name: ");
         PrintStream out = null;
         do {
-            String outputName = console.next();
+            String outputName;
+            outputName = console.next();
+//            outputName = "c:\\users\\smckinnon\\raml\\output.html";
             File f = new File(outputName);
             try{
                 if(f.exists()) {
@@ -172,7 +174,9 @@ public class ProcessRAMLFile {
         Scanner out = null;
 
         do {
-            String outputName = console.next();
+            String outputName;
+//            outputName = "c:\\users\\smckinnon\\raml\\iris.min.raml";
+            outputName = console.next();
             try {
                 out = new Scanner(new File(outputName));
                 //example = new Scanner(new File("C:\\Users\\Ian\\Documents\\GitHub\\raml-printer\\Docs\\super-simple RAML Example.raml"));

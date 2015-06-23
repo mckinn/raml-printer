@@ -69,6 +69,12 @@ public class RAMLResponsesValues extends RAMLToken {
                     currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
                     successful = true;
                     break;
+                case headers:
+                    System.out.println("headers: in ResponseCode" + this.responseCode + ":");
+                    ramlEntity = new RAMLQueryParameter(importantInformation.getLeadingSpaces(), "Headers");
+                    currentLine = ramlEntity.vaccuumRAMLFIle(example,currentLine);
+                    successful = true;
+                    break;
                 default:
                     System.out.println("Warning: default or unknown token in response code: = " + this.responseCode + ":  at line "+ example.getLine() + " for token:  " + importantInformation.getFirstToken());
             }
@@ -96,11 +102,10 @@ public class RAMLResponsesValues extends RAMLToken {
 
         if ((rat = subtendingThings.findMarkupType(markupType.description)) != null) outcome += rat.formatRAMLasHTML(true);
 
-        for (RAMLToken rt: subtendingThings){
-            if (rt.getMarkupType() == markupType.body) {
-                outcome += rt.formatRAMLasHTML(true);
-            }
-        }
+        if ((rat = subtendingThings.findMarkupType(markupType.queryParameters)) != null) outcome += rat.formatRAMLasHTML(true);
+
+        if ((rat = subtendingThings.findMarkupType(markupType.body)) != null) outcome += rat.formatRAMLasHTML(true);
+
         outcome += "\n</div>\n";
         return outcome;
     }

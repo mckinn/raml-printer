@@ -12,6 +12,7 @@ public enum markupType {
     responses,
     responsesvalues,         //  [200,201...]
     queryParameters,
+    headers,                // different string value, but behaviorally the same as queryParameters
     queryParameterNames,    // [(a-z)*:]
     qpType,
     qpMaximim,
@@ -42,6 +43,8 @@ public enum markupType {
         else if (inputString.equals("example:")) return example;
         else if (inputString.equals("responses:")) return responses;
         else if (inputString.equals("queryParameters:")) return queryParameters;
+        // treat headers the same way that we treat queryParameters
+        else if (inputString.equals("headers:")) return headers;
         else if (inputString.equals("type:")) return qpType;
         else if (inputString.equals("maximum:")) return qpMaximim;
         else if (inputString.equals("minimum:")) return qpMinimum;
@@ -74,6 +77,7 @@ public enum markupType {
             case responses: return "responses:" ;
             case responsesvalues: return "HTTP Responses [nnn]:" ;
             case queryParameters: return "queryParameters:" ;
+            case headers: return "headers:";
             case queryParameterNames: return "qp names:" ;
             case qpType: return "type:" ;
             case qpMaximim: return "maximum:" ;
@@ -106,6 +110,7 @@ public enum markupType {
             case responsesvalues: return "responseCodesCSS" ;
             case queryParameters: return "queryParametersCSS" ;
             case queryParameterNames: return "qpNamesCSS" ;
+            case headers: return "qpNamesCSS" ;
             case qpType: return "qpCSS" ;
             case qpMaximim: return "qpCSS" ;
             case qpMinimum: return "qpCSS" ;
